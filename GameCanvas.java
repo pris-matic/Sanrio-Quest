@@ -4,7 +4,6 @@ import java.awt.event.*;
 import java.awt.geom.*;
 import java.util.ArrayList;
 
-
 /**
 The GameCanvas class is responsible for drawing the
 character sprites necessary for the game. Custom Drawings
@@ -43,6 +42,19 @@ public class GameCanvas extends JComponent {
         this.p2 = p2;
         t = new Timer(15, new PlayerTimer());
         t.start();
+        this.setPreferredSize(new Dimension(800,600));
+
+        gameBackground = new ArrayList<>();
+
+        Walls a = new Walls(0, 0, 800, 50);
+        Walls b = new Walls(0, 0, 50, 600);
+        Walls c = new Walls(750, 0, 50, 600);
+        Walls d = new Walls(0, 550,800, 50);
+
+        gameBackground.add(a);
+        gameBackground.add(b);
+        gameBackground.add(c);
+        gameBackground.add(d);
 
     }
 
@@ -58,48 +70,79 @@ public class GameCanvas extends JComponent {
 
         AffineTransform reset = g2d.getTransform();
 
-        p.drawCharacter(g2d);
-        p.getCharaterType().drawWeapon(g2d);
+        for (Walls w : gameBackground){
+            w.draw(g2d);
+        }
 
+        // draws the character and its weapon
+        p.drawCharacter(g2d);
+        p.getCharacterType().drawWeapon(g2d);
+    
+        // resets its rotation and then draws the attack / projectiles
         g2d.setTransform(reset);
+        p.getCharacterType().drawAttacks(g2d);
         
+        // draws the second character and its weapon
         p2.drawCharacter(g2d);
-        p2.getCharaterType().drawWeapon(g2d);
-        
+        p2.getCharacterType().drawWeapon(g2d);
+
+        // resets its rotation and then draws the attack / projectiles
+        g2d.setTransform(reset);
+        p2.getCharacterType().drawAttacks(g2d);
+
         g2d.dispose();
 
     } 
 
-    public Player getPlayer(){
-        return p;
-    }
-
     class PlayerTimer implements ActionListener{
-
-        private int distance;
-
+        
         public PlayerTimer(){
-            distance = 5;
+
         }
 
         @Override
         public void actionPerformed(ActionEvent ae) {
-            if (p.isMovingUp()){
-                p.moveY(-distance);
+            if (p.isMovingUp() ){
+                p.moveY(-(p.getSpeed()));
+                if ((checkCollision(p))){
+                    p.moveY(p.getSpeed());
+                }
             }
             if (p.isMovingDown()){
-                p.moveY(distance);
+                p.moveY(p.getSpeed());
+                if ((checkCollision(p))){
+                    p.moveY(-(p.getSpeed()));
+                }
             }
             if (p.isMovingLeft()){
-                p.moveX(-distance);
+                p.moveX(-(p.getSpeed()));
+                if ((checkCollision(p))){
+                    p.moveX(p.getSpeed());
+                }
             }
             if (p.isMovingRight()){
-                p.moveX(distance);
+                p.moveX(p.getSpeed());
+                if ((checkCollision(p))){
+                    p.moveX(-(p.getSpeed()));
+                }
             }
 
             repaint();
         }
 
+    }
+
+    public boolean checkCollision(CharacterManager cm){
+        
+        boolean collision = false;
+        
+        for (Walls w : gameBackground){
+            if (cm.isCollidingWithWall(w)){
+                collision = true;
+                break;
+            }
+        }
+        return collision;
     }
 
 }

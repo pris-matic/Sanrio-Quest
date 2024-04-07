@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 
 /**
 The GameServer class is responsible for server-sided operations.
@@ -43,6 +44,9 @@ public class GameServer {
     private String p1Name,p2Name;
     private double p1x,p1y,p2x,p2y,p1rotation,p2rotation;
 
+    private int p1ProjectileCount, p2ProjectileCount;
+    private ArrayList<Double> p1ProjectileX,p1ProjectileY,p2ProjectileX,p2ProjectileY;
+
     public GameServer(){
 
         playerCount = 0;
@@ -54,10 +58,14 @@ public class GameServer {
         p1x = 200;
         p1y = 200;
         p1rotation = 0;
+        p1ProjectileX = new ArrayList<>();
+        p1ProjectileY = new ArrayList<>();
 
         p2x = 400;
         p2y = 200;
         p2rotation = 0;
+        p2ProjectileX = new ArrayList<>();
+        p2ProjectileY = new ArrayList<>();
 
         try {
             ss = new ServerSocket(45375);
@@ -134,11 +142,25 @@ public class GameServer {
                         p1x = dataIn.readDouble();
                         p1y = dataIn.readDouble();
                         p1rotation = dataIn.readDouble();
+                        p1ProjectileCount = dataIn.readInt();
+
+                        for (int i = 0; i < p1ProjectileCount ; i++){
+                            p1ProjectileX.add(dataIn.readDouble());
+                            p1ProjectileY.add(dataIn.readDouble());
+                        }
+                        
                     } else {
                         p2Name = dataIn.readUTF();
                         p2x = dataIn.readDouble();
                         p2y = dataIn.readDouble();
                         p2rotation = dataIn.readDouble();
+                        p2ProjectileCount = dataIn.readInt();
+
+                        for (int i = 0; i < p2ProjectileCount ; i++){
+                            p2ProjectileX.add(dataIn.readDouble());
+                            p2ProjectileY.add(dataIn.readDouble());
+                        }
+
                     }
                 }
             } catch (IOException ex) {
@@ -168,17 +190,39 @@ public class GameServer {
                         dataOut.writeDouble(p2x);
                         dataOut.writeDouble(p2y);
                         dataOut.writeDouble(p2rotation);
+                        dataOut.writeInt(p2ProjectileCount);
+
+                        for (int i = 0; i < p2ProjectileCount ; i++){
+                            System.out.println("p2 projectile count: " + p2ProjectileCount);
+                            dataOut.writeDouble(p2ProjectileX.get(i));
+                            dataOut.writeDouble(p2ProjectileY.get(i));
+                        }
+          
+                        p2ProjectileX.clear();
+                        p2ProjectileY.clear();
                         dataOut.flush();
+
                     } else {
                         dataOut.writeUTF(p1Name);
                         dataOut.writeDouble(p1x);
                         dataOut.writeDouble(p1y);
                         dataOut.writeDouble(p1rotation);
+                        dataOut.writeInt(p1ProjectileCount);
+                        
+                        for (int i = 0; i < p1ProjectileCount ; i++){
+                            System.out.println("p1 projectile count: " + p1ProjectileCount);
+                            dataOut.writeDouble(p1ProjectileX.get(i));
+                            dataOut.writeDouble(p1ProjectileY.get(i));
+                        }
+
+                        p1ProjectileX.clear();
+                        p1ProjectileY.clear();
+
                         dataOut.flush();
                     }
 
                     try {
-                        Thread.sleep(20);
+                        Thread.sleep(15);
                     } catch (InterruptedException ex) {
                         System.out.println("InterruptedException from WTC.run()");
                     }

@@ -1,8 +1,8 @@
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 
 /**
 The GameFrame class sets up the player, and displays
@@ -29,8 +29,7 @@ of our program.
 */
 
 public class GameFrame {
-    
-    private int width,height;
+
     private JFrame frame;
     private JPanel gamePane;
     private GameCanvas gc;
@@ -48,8 +47,6 @@ public class GameFrame {
     
     public GameFrame(){
 
-        width = 800;
-        height = 600;
         frame = new JFrame();
         gamePane = (JPanel) frame.getContentPane();
         gamePane.setFocusable(true);
@@ -63,7 +60,6 @@ public class GameFrame {
         createPlayers();
     
         frame.setTitle("Dungeon Crawler Testing | " + p.getName());
-        frame.setPreferredSize(new Dimension(width,height));
 
         gc = new GameCanvas(p,p2);
         frame.add(gc);
@@ -122,17 +118,17 @@ public class GameFrame {
         private CharacterType ct;
 
         public ConfigureWeapon(){
-            ct = p.getCharaterType();
+            ct = p.getCharacterType();
         }
 
         @Override
         public void mouseClicked(MouseEvent me) {
-            
+            ct.attack();
         }
 
         @Override
         public void mousePressed(MouseEvent me) {
-           
+
         }
 
         @Override
@@ -153,13 +149,11 @@ public class GameFrame {
         @Override
         public void mouseDragged(MouseEvent me) {
             ct.changeRotation(me.getY(),me.getX());
-
         }
 
         @Override
         public void mouseMoved(MouseEvent me) {
             ct.changeRotation(me.getY(),me.getX());
-
         }
 
     }
@@ -189,13 +183,14 @@ public class GameFrame {
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0,true), "releasedLeft");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0,true), "releasedRight");
 
+        frame.addMouseListener(new ConfigureWeapon());
         frame.addMouseMotionListener(new ConfigureWeapon());
 
     }
 
     // Networking / Server Handling
 
-    class ReadFromServer implements Runnable {
+    class ReadFromServer implements Runnable {   
 
         private DataInputStream dataIn;
 
@@ -212,13 +207,44 @@ public class GameFrame {
                     String playerName = dataIn.readUTF();
                     double playerX = dataIn.readDouble();
                     double playerY = dataIn.readDouble();
-                    double playerRotation = dataIn.readDouble();
+                    double weaponRotation = dataIn.readDouble();
+
+                    int projectileCount = dataIn.readInt();
+
+                    ArrayList<Double> projectileX = new ArrayList<>();
+                    ArrayList<Double> projectileY = new ArrayList<>();
+
+                    for (int i = 0; i < projectileCount ; i++){
+                        projectileX.add(dataIn.readDouble());
+                        projectileY.add(dataIn.readDouble());
+                    }  
+
+                   
                     
                     if(p2 != null){
                         p2.setName(playerName);
                         p2.setX(playerX);
                         p2.setY(playerY);
-                        p2.getCharaterType().setRotation(playerRotation);
+                        p2.getCharacterType().setRotation(weaponRotation);
+                        p2.getCharacterType().getProjectiles().clear();
+
+                        // a getter method to determine what type of projectile is being sent
+                        CharacterType ct = p.getCharacterType();
+                        
+                        for (int i = 0; i < projectileCount ; i++){ 
+                            if (ct instanceof Ranger){
+                                CharacterType.Projectiles b = ((Ranger) ct).new Bullet(projectileX.get(i), projectileY.get(i), weaponRotation);
+                                p2.getCharacterType().getProjectiles().add(b);
+                            } else if (ct instanceof Wizard){
+    
+                            }
+                            
+                        }
+
+                        projectileX.clear();
+                        projectileY.clear();
+                        
+
                     }   
                 }
             } catch (IOException ex) {
@@ -261,19 +287,25 @@ public class GameFrame {
                         dataOut.writeUTF(p.getName());
                         dataOut.writeDouble(p.getX());
                         dataOut.writeDouble(p.getY());
-                        dataOut.writeDouble(p.getCharaterType().getRotation());
+                        dataOut.writeDouble(p.getCharacterType().getRotation());
+                        dataOut.writeInt(p.getCharacterType().getProjectiles().size());
+                        
+                        for (int i = 0; i < p.getCharacterType().getProjectiles().size() ; i++){
+                            dataOut.writeDouble(p.getCharacterType().getProjectiles().get(i).getX());
+                            dataOut.writeDouble(p.getCharacterType().getProjectiles().get(i).getY());
+                        }
+
                         dataOut.flush();
+
                     }
 
                     try {
-                        Thread.sleep(20);
+                        Thread.sleep(15);
                     } catch (InterruptedException ex) {
                         System.out.println("InterruptedException from WTS.run()");
                     }
                 }
-
-                
-                
+           
             } catch (IOException ex) {
                 System.out.println("IOException from WTS.run()");
             }
