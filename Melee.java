@@ -1,4 +1,5 @@
 import java.awt.Graphics2D;
+import java.util.ArrayList;
 
 /**
 The Melee class is a subclass of the <code> CharacterType </code>
@@ -31,10 +32,6 @@ public class Melee extends CharacterType {
         atk = 4;
         def = 10;
 
-        atkCooldown = 0.6;
-        skillCooldown = 5;
-        specialCooldown = 15;
-
         this.cm = cm;
     }
 
@@ -49,9 +46,28 @@ public class Melee extends CharacterType {
     }
 
     @Override
+    public void drawAttacks(Graphics2D g2d){
+        
+    }
+
+    @Override
     public void changeRotation(double yPos, double xPos){
         
     }
+
+    @Override
+    public void attack(){
+        
+    }
     
+    @Override
+    public ArrayList<Projectiles> getProjectiles(){
+        return null;
+    }
+
+    @Override
+    public void attackMovement(){
+        
+    }
 
 }

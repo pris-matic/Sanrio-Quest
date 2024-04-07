@@ -1,4 +1,5 @@
 import java.awt.Graphics2D;
+import java.util.ArrayList;
 
 /**
 The Melee class is a subclass of the <code> CharacterType </code>
@@ -31,10 +32,6 @@ public class Wizard extends CharacterType{
         atk = 7;
         def = 5;
 
-        atkCooldown = 0.5;
-        skillCooldown = 4;
-        specialCooldown = 10;
-
         this.cm = cm;
     }
 
@@ -49,7 +46,27 @@ public class Wizard extends CharacterType{
     }
 
     @Override
+    public void drawAttacks(Graphics2D g2d){
+
+    }
+
+    @Override
     public void changeRotation(double yPos, double xPos){
+        
+    }
+
+    @Override
+    public void attack(){
+        
+    }
+
+    @Override
+    public ArrayList<Projectiles> getProjectiles(){
+        return null;
+    }
+
+    @Override
+    public void attackMovement(){
         
     }
  
