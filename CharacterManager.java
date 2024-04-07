@@ -28,7 +28,7 @@ of our program.
 public abstract class CharacterManager {
     
     protected double x, y; // player's coordinates
-    protected int width, height;
+    protected int width, height, speed;
     protected boolean up,down,left,right;
 
     public void moveX(double movement){
@@ -77,6 +77,10 @@ public abstract class CharacterManager {
 
     public boolean isMovingRight(){
         return right;
+    }
+
+    public int getSpeed(){
+        return speed;
     }
 
     //TODO do collision later!
