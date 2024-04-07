@@ -1,4 +1,5 @@
 import java.awt.Graphics2D;
+import java.util.ArrayList;
 
 /**
 The CharacterType abstract class is used to define the 
@@ -38,9 +39,6 @@ public abstract class CharacterType {
     protected double x,y,rotation;
     
     protected boolean alive; // determines if hp is greater than 0
-
-    // cooldown of attacks of each character
-    protected double atkCooldown, skillCooldown, specialCooldown;
     
     public int getHealth(){
         return hp;
@@ -56,18 +54,6 @@ public abstract class CharacterType {
 
     public boolean isAlive(){
         return alive;
-    }
-
-    public double getAutoCooldown(){
-        return atkCooldown;
-    }
-
-    public double getSkillCooldown(){
-        return skillCooldown;
-    }
-
-    public double getSpecialCooldown(){
-        return specialCooldown;
     }
 
     public void takeDamage(double damage){
@@ -101,6 +87,75 @@ public abstract class CharacterType {
 
     public abstract void drawWeapon(Graphics2D g2d);
 
+    public abstract void drawAttacks(Graphics2D g2d);
+
     public abstract void changeRotation(double yPos, double xPos);
+
+    public abstract void attack();
+
+    public abstract ArrayList<Projectiles> getProjectiles();
+
+    abstract class Projectiles {
+        
+        protected double xPos,yPos,initX,initY,projectileRotation, width, height;
+        protected int projectileSpeed;
+
+        public void moveProjectileX(){
+            this.xPos += projectileSpeed * Math.cos(projectileRotation);
+        }
+
+        public void moveProjectileY(){
+            this.yPos += projectileSpeed * Math.sin(projectileRotation);
+        }
+
+        public void setProjectileX(double position){
+            this.xPos = position;
+        }
+
+        public void setProjectileY(double position){
+            this.yPos = position;
+        }
+
+        public double getX(){
+            return this.xPos;
+        }
+
+        public double getInitX(){
+            return this.initX;
+        }
+
+        public double getY(){
+            return this.yPos;
+        }
+
+        public double getInitY(){
+            return this.initY;
+        }
+
+        public double getWidth(){
+            return this.width;
+        }
+
+        public double getHeight(){
+            return this.height;
+        }
+
+        public abstract void drawProjectile(Graphics2D g2d);
+
+    }
+
+    public abstract void attackMovement();
+
+    public void removeProjectiles(ArrayList<Projectiles> projectiles){
+
+        for  (int i = 0; i < projectiles.size() ; i ++){
+            double x = Math.abs(projectiles.get(i).getX() - projectiles.get(i).getInitX());
+            double y = Math.abs(projectiles.get(i).getY() - projectiles.get(i).getInitY());
+            double pythagorean = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+            if (pythagorean >= 400){
+                projectiles.remove(i);
+            }
+        }
+    }
 
 }
