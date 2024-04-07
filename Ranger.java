@@ -1,5 +1,8 @@
 import java.awt.*;
+import java.awt.event.*;
 import java.awt.geom.*;
+import java.util.ArrayList;
+import javax.swing.*;
 
 /**
 The Ranger class is a subclass of the <code> CharacterType </code>
@@ -27,16 +30,19 @@ of our program.
 
 public class Ranger extends CharacterType {
     
+    private ArrayList<Projectiles> bulletList;
+    private Timer projectileMovement;
+
     public Ranger(CharacterManager cm){
+        
         hp = 75;
         atk = 10;
         def = 3;
 
-        atkCooldown = 0.333;
-        skillCooldown = 5;
-        specialCooldown = 15;
+        alive = true;
 
         this.cm = cm;
+        bulletList = new ArrayList<>();
 
     }
 
@@ -49,20 +55,90 @@ public class Ranger extends CharacterType {
     public void drawWeapon(Graphics2D g2d) {
         
         g2d.setColor(Color.GREEN);
-        // Rectangle2D.Double rangerWep = new Rectangle2D.Double(p.getX()-25,p.getY()+p.getHeight()-55,115,35);
-        Rectangle2D.Double rangerWep = new Rectangle2D.Double(cm.getX()-25,cm.getY()+cm.getHeight()-55,115,25);
-        g2d.rotate(rotation-Math.toRadians(90),cm.getX()+32.5,cm.getY()+cm.getHeight()-55);
+
+        Rectangle2D.Double rangerWep = new Rectangle2D.Double((cm.getX()+cm.getWidth()/2),cm.getY()+15,35,110);
+        g2d.rotate(rotation,(cm.getX()+cm.getWidth()/2),cm.getY()+(cm.getHeight()/2)+10);
         g2d.fill(rangerWep);
-        
+
+    }
+
+    @Override
+    public void drawAttacks(Graphics2D g2d){
+        for (Projectiles b : bulletList){
+            b.drawProjectile(g2d);
+        }
     }
 
     @Override
     public void changeRotation(double yPos, double xPos){
 
-        double dy = yPos - (cm.getY()+cm.getHeight()-55);
-        double dx = xPos - (cm.getX()+32.5);
+        double dy = yPos - ((cm.getY()+(cm.getHeight()/2))+25);
+        double dx = xPos - (cm.getX()+(cm.getWidth()/2));
         rotation = Math.atan2(dy,dx);
 
+    }
+
+    @Override
+    public void attack(){
+
+        if (bulletList.size() < 3){
+            bulletList.add(new Bullet((cm.getX()+(cm.getWidth()/2)) - 15, (cm.getY()+(cm.getHeight()/2)) - 20, rotation));
+            attackMovement();
+        }
+        
+    }
+
+    @Override
+    public void attackMovement(){
+
+        if (projectileMovement == null || !projectileMovement.isRunning()){
+            ActionListener moveBullets = new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent ae) {
+                    
+                    for (int i = 0; i < bulletList.size() ; i++){
+                        bulletList.get(i).moveProjectileX();
+                        bulletList.get(i).moveProjectileY();
+                    }
+    
+                    removeProjectiles(bulletList);
+    
+                }
+            };
+            projectileMovement = new Timer(15, moveBullets);
+            projectileMovement.start();
+        }
+    
+    }
+
+    @Override
+    public ArrayList<Projectiles> getProjectiles(){
+        return bulletList;
+    }
+
+    class Bullet extends Projectiles{
+
+        public Bullet(double x, double y, double rotation){
+            xPos = x;
+            yPos = y;
+            
+            initX = x;
+            initY = y;
+
+            projectileSpeed = 5;
+            projectileRotation = rotation;
+
+            width = 20;
+            height = 20;
+        }
+
+        @Override
+        public void drawProjectile(Graphics2D g2d){
+            g2d.setColor(Color.BLUE);
+            Ellipse2D.Double bullet = new Ellipse2D.Double(xPos,yPos,this.width,this.height);
+            g2d.fill(bullet);
+        }
     }
 
 }
