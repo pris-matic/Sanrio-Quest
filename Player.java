@@ -52,6 +52,7 @@ public class Player extends CharacterManager{
 
         height = 120;
         width = 65;
+        speed = 5;
         
     }
 
@@ -65,7 +66,7 @@ public class Player extends CharacterManager{
    
     }
 
-    public CharacterType getCharaterType(){
+    public CharacterType getCharacterType(){
         return ct;
     }
 
