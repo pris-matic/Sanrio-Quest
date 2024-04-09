@@ -102,7 +102,7 @@ public class GameCanvas extends JComponent {
 
         @Override
         public void actionPerformed(ActionEvent ae) {
-            if (p.isMovingUp() ){
+            if (p.isMovingUp()){
                 p.moveY(-(p.getSpeed()));
                 if ((checkCollision(p))){
                     p.moveY(p.getSpeed());
