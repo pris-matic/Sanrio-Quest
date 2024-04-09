@@ -1,4 +1,5 @@
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 /**
@@ -37,8 +38,10 @@ public abstract class CharacterType {
     protected int hp, atk, def, maxHp; // stats
     protected CharacterManager cm;
     protected double x,y,rotation;
+    protected BufferedImage front1,front2,left1,left2,right1,right2;
     
     protected boolean alive; // determines if hp is greater than 0
+    protected boolean attacking; // whether the player is currently attacking
     
     public int getHealth(){
         return hp;
@@ -54,6 +57,10 @@ public abstract class CharacterType {
 
     public boolean isAlive(){
         return alive;
+    }
+
+    public boolean isAttacking(){
+        return attacking;
     }
 
     public void takeDamage(double damage){
@@ -84,6 +91,8 @@ public abstract class CharacterType {
     }
 
     public abstract String showCharacterType();
+
+    public abstract BufferedImage getCharacterImages();
 
     public abstract void drawWeapon(Graphics2D g2d);
 
