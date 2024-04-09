@@ -1,8 +1,9 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import javax.swing.*;
+import javax.swing.Timer;
 
 /**
 The Ranger class is a subclass of the <code> CharacterType </code>
@@ -31,7 +32,7 @@ of our program.
 public class Ranger extends CharacterType {
     
     private ArrayList<Projectiles> bulletList;
-    private Timer projectileMovement;
+    private Timer bulletMovement;
 
     public Ranger(CharacterManager cm){
         
@@ -43,6 +44,7 @@ public class Ranger extends CharacterType {
 
         this.cm = cm;
         bulletList = new ArrayList<>();
+        attacking = false;
 
     }
 
@@ -52,11 +54,16 @@ public class Ranger extends CharacterType {
     }
 
     @Override
+    public BufferedImage getCharacterImages(){
+        return null;
+    }
+
+    @Override
     public void drawWeapon(Graphics2D g2d) {
         
         g2d.setColor(Color.GREEN);
 
-        Rectangle2D.Double rangerWep = new Rectangle2D.Double((cm.getX()+cm.getWidth()/2),cm.getY()+15,35,110);
+        Rectangle2D.Double rangerWep = new Rectangle2D.Double((cm.getX()+cm.getWidth()/2),cm.getY()+15,35,90);
         g2d.rotate(rotation,(cm.getX()+cm.getWidth()/2),cm.getY()+(cm.getHeight()/2)+10);
         g2d.fill(rangerWep);
 
@@ -81,33 +88,36 @@ public class Ranger extends CharacterType {
     @Override
     public void attack(){
 
-        if (bulletList.size() < 3){
+        attacking = true;
+
+        if (bulletList.size() < 5){
             bulletList.add(new Bullet((cm.getX()+(cm.getWidth()/2)) - 15, (cm.getY()+(cm.getHeight()/2)) - 20, rotation));
-            attackMovement();
         }
+        attackMovement();
         
     }
 
     @Override
     public void attackMovement(){
 
-        if (projectileMovement == null || !projectileMovement.isRunning()){
+        if (bulletMovement == null || !bulletMovement.isRunning()){
             ActionListener moveBullets = new ActionListener() {
 
                 @Override
                 public void actionPerformed(ActionEvent ae) {
                     
+                    removeProjectiles(bulletList);
+                    
                     for (int i = 0; i < bulletList.size() ; i++){
                         bulletList.get(i).moveProjectileX();
                         bulletList.get(i).moveProjectileY();
                     }
-    
-                    removeProjectiles(bulletList);
-    
+
+                    attacking = false;
                 }
             };
-            projectileMovement = new Timer(15, moveBullets);
-            projectileMovement.start();
+            bulletMovement = new Timer(15, moveBullets);
+            bulletMovement.start();
         }
     
     }
