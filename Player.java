@@ -50,8 +50,8 @@ public class Player extends CharacterManager{
         left = false;
         right = false;
 
-        height = 120;
-        width = 65;
+        height = 100;
+        width = 75;
         speed = 5;
         
     }
@@ -61,6 +61,8 @@ public class Player extends CharacterManager{
        
         Rectangle2D.Double playerSprite = new Rectangle2D.Double(x, y, width, height);
         g2d.setColor(Color.BLACK);
+        // TODO change to drawImage if all images are here
+        // g2d.drawImage(ct.getCharacterImages(),(int) x,(int) y,width,height,null);  
         g2d.fill(playerSprite);
         g2d.drawString(name, (int) x, (int)y);
    
