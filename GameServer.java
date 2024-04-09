@@ -143,10 +143,12 @@ public class GameServer {
                         p1y = dataIn.readDouble();
                         p1rotation = dataIn.readDouble();
                         p1ProjectileCount = dataIn.readInt();
-
-                        for (int i = 0; i < p1ProjectileCount ; i++){
-                            p1ProjectileX.add(dataIn.readDouble());
-                            p1ProjectileY.add(dataIn.readDouble());
+    
+                        if (p1ProjectileCount > 0){
+                            for (int i = 0; i < p1ProjectileCount ; i++){
+                                p1ProjectileX.add(dataIn.readDouble());
+                                p1ProjectileY.add(dataIn.readDouble());
+                            }
                         }
                         
                     } else {
@@ -156,9 +158,11 @@ public class GameServer {
                         p2rotation = dataIn.readDouble();
                         p2ProjectileCount = dataIn.readInt();
 
-                        for (int i = 0; i < p2ProjectileCount ; i++){
-                            p2ProjectileX.add(dataIn.readDouble());
-                            p2ProjectileY.add(dataIn.readDouble());
+                        if (p2ProjectileCount > 0){
+                            for (int i = 0; i < p2ProjectileCount ; i++){
+                                p2ProjectileX.add(dataIn.readDouble());
+                                p2ProjectileY.add(dataIn.readDouble());
+                            }
                         }
 
                     }
@@ -193,7 +197,6 @@ public class GameServer {
                         dataOut.writeInt(p2ProjectileCount);
 
                         for (int i = 0; i < p2ProjectileCount ; i++){
-                            System.out.println("p2 projectile count: " + p2ProjectileCount);
                             dataOut.writeDouble(p2ProjectileX.get(i));
                             dataOut.writeDouble(p2ProjectileY.get(i));
                         }
@@ -203,14 +206,14 @@ public class GameServer {
                         dataOut.flush();
 
                     } else {
+                        
                         dataOut.writeUTF(p1Name);
                         dataOut.writeDouble(p1x);
                         dataOut.writeDouble(p1y);
                         dataOut.writeDouble(p1rotation);
                         dataOut.writeInt(p1ProjectileCount);
-                        
+
                         for (int i = 0; i < p1ProjectileCount ; i++){
-                            System.out.println("p1 projectile count: " + p1ProjectileCount);
                             dataOut.writeDouble(p1ProjectileX.get(i));
                             dataOut.writeDouble(p1ProjectileY.get(i));
                         }

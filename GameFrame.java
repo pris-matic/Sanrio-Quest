@@ -74,11 +74,11 @@ public class GameFrame {
 
     private void createPlayers(){
         if (playerID == 1){
-            p = new Player("prism", "ranger",200,200);
-            p2 = new Player("test","ranger",400,200);
+            p = new Player("prism", "wizard",200,200);
+            p2 = new Player("test","melee",400,200);
         } else {
-            p2 = new Player("prism", "ranger",200,200);
-            p = new Player("test","ranger",400,200);
+            p2 = new Player("prism", "wizard",200,200);
+            p = new Player("test","melee",400,200);
         }
     }
 
@@ -148,12 +148,16 @@ public class GameFrame {
 
         @Override
         public void mouseDragged(MouseEvent me) {
-            ct.changeRotation(me.getY(),me.getX());
+            if (!ct.isAttacking()){
+                ct.changeRotation(me.getY(),me.getX());
+            }
         }
 
         @Override
         public void mouseMoved(MouseEvent me) {
-            ct.changeRotation(me.getY(),me.getX());
+            if (!ct.isAttacking()){
+                ct.changeRotation(me.getY(),me.getX());
+            }
         }
 
     }
@@ -190,7 +194,7 @@ public class GameFrame {
 
     // Networking / Server Handling
 
-    class ReadFromServer implements Runnable {   
+    class ReadFromServer implements Runnable {
 
         private DataInputStream dataIn;
 
@@ -208,7 +212,6 @@ public class GameFrame {
                     double playerX = dataIn.readDouble();
                     double playerY = dataIn.readDouble();
                     double weaponRotation = dataIn.readDouble();
-
                     int projectileCount = dataIn.readInt();
 
                     ArrayList<Double> projectileX = new ArrayList<>();
@@ -219,32 +222,30 @@ public class GameFrame {
                         projectileY.add(dataIn.readDouble());
                     }  
 
-                   
-                    
                     if(p2 != null){
                         p2.setName(playerName);
                         p2.setX(playerX);
                         p2.setY(playerY);
                         p2.getCharacterType().setRotation(weaponRotation);
-                        p2.getCharacterType().getProjectiles().clear();
-
-                        // a getter method to determine what type of projectile is being sent
-                        CharacterType ct = p.getCharacterType();
                         
-                        for (int i = 0; i < projectileCount ; i++){ 
-                            if (ct instanceof Ranger){
-                                CharacterType.Projectiles b = ((Ranger) ct).new Bullet(projectileX.get(i), projectileY.get(i), weaponRotation);
-                                p2.getCharacterType().getProjectiles().add(b);
-                            } else if (ct instanceof Wizard){
-    
+                        if (p2.getCharacterType().getProjectiles() != null){
+                            // a getter method to determine what type of projectile is being sent
+                            CharacterType ct = p2.getCharacterType();
+                            p2.getCharacterType().getProjectiles().clear();
+                            for (int i = 0; i < projectileCount ; i++){ 
+                                if (ct instanceof Ranger){
+                                    CharacterType.Projectiles b = ((Ranger) ct).new Bullet(projectileX.get(i), projectileY.get(i), weaponRotation);
+                                    p2.getCharacterType().getProjectiles().add(b);
+                                } else if (ct instanceof Wizard){
+                                    CharacterType.Projectiles o = ((Wizard) ct). new Orb(projectileX.get(i), projectileY.get(i), weaponRotation);
+                                    p2.getCharacterType().getProjectiles().add(o);
+                                }
                             }
-                            
                         }
 
                         projectileX.clear();
                         projectileY.clear();
-                        
-
+                    
                     }   
                 }
             } catch (IOException ex) {
@@ -280,7 +281,6 @@ public class GameFrame {
         @Override
         public void run(){
             try {
-
                 while (true){
                     
                     if(p != null){
@@ -288,11 +288,16 @@ public class GameFrame {
                         dataOut.writeDouble(p.getX());
                         dataOut.writeDouble(p.getY());
                         dataOut.writeDouble(p.getCharacterType().getRotation());
-                        dataOut.writeInt(p.getCharacterType().getProjectiles().size());
                         
-                        for (int i = 0; i < p.getCharacterType().getProjectiles().size() ; i++){
-                            dataOut.writeDouble(p.getCharacterType().getProjectiles().get(i).getX());
-                            dataOut.writeDouble(p.getCharacterType().getProjectiles().get(i).getY());
+                        if (p.getCharacterType().getProjectiles() != null){
+                            dataOut.writeInt(p.getCharacterType().getProjectiles().size());
+                        
+                            for (int i = 0; i < p.getCharacterType().getProjectiles().size() ; i++){
+                                dataOut.writeDouble(p.getCharacterType().getProjectiles().get(i).getX());
+                                dataOut.writeDouble(p.getCharacterType().getProjectiles().get(i).getY());
+                            }
+                        } else {
+                            dataOut.writeInt(0);
                         }
 
                         dataOut.flush();
