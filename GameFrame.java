@@ -3,6 +3,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 /**
 The GameFrame class sets up the player, and displays
@@ -34,9 +35,9 @@ public class GameFrame {
     private JPanel gamePane;
     private GameCanvas gc;
 
-    // TODO fix networking issue here
-    // private String name;
-    // private String playerType;
+    // used to get the player's names and the CharacterType they are using
+    private String name,playerType;
+    private String p2Name,p2PlayerType;
 
     private Player p;
     private Player p2;
@@ -73,12 +74,13 @@ public class GameFrame {
     }
 
     private void createPlayers(){
+        
         if (playerID == 1){
-            p = new Player("prism", "wizard",200,200);
-            p2 = new Player("test","melee",400,200);
+            p = new Player(name,playerType,200,200);
+            p2 = new Player(p2Name,p2PlayerType,400,200);
         } else {
-            p2 = new Player("prism", "wizard",200,200);
-            p = new Player("test","melee",400,200);
+            p2 = new Player(p2Name,p2PlayerType,200,200);
+            p = new Player(name,playerType,400,200);
         }
     }
 
@@ -113,7 +115,7 @@ public class GameFrame {
 
     }
 
-    class ConfigureWeapon implements MouseListener, MouseMotionListener{
+    class ConfigureWeapon extends MouseAdapter{
 
         private CharacterType ct;
 
@@ -124,26 +126,6 @@ public class GameFrame {
         @Override
         public void mouseClicked(MouseEvent me) {
             ct.attack();
-        }
-
-        @Override
-        public void mousePressed(MouseEvent me) {
-
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent me) {
-            
-        }
-
-        @Override
-        public void mouseEntered(MouseEvent me) {
-
-        }
-
-        @Override
-        public void mouseExited(MouseEvent me) {
-            
         }
 
         @Override
@@ -200,11 +182,12 @@ public class GameFrame {
 
         public ReadFromServer(DataInputStream in){
             dataIn = in;
+
             System.out.println("RFS initialized");
         }
 
         @Override
-        public void run(){
+        public void run() {
             try {
                 while (true){
 
@@ -212,6 +195,17 @@ public class GameFrame {
                     double playerX = dataIn.readDouble();
                     double playerY = dataIn.readDouble();
                     double weaponRotation = dataIn.readDouble();
+                    
+                    // TODO for byte array
+                    // boolean hasProjectiles = dataIn.readBoolean();
+
+                    // byte[] projectileData = null;
+                    // if (hasProjectiles){
+                    //     int arraySize = dataIn.readInt();
+                    //     projectileData = new byte[arraySize];
+                    //     dataIn.readFully(projectileData);
+                    // }
+
                     int projectileCount = dataIn.readInt();
 
                     ArrayList<Double> projectileX = new ArrayList<>();
@@ -221,13 +215,35 @@ public class GameFrame {
                         projectileX.add(dataIn.readDouble());
                         projectileY.add(dataIn.readDouble());
                     }  
-
+                    
                     if(p2 != null){
                         p2.setName(playerName);
                         p2.setX(playerX);
                         p2.setY(playerY);
                         p2.getCharacterType().setRotation(weaponRotation);
                         
+                        // if (p2.getCharacterType().getProjectiles() != null){
+                        //     ByteArrayInputStream byteIn = new ByteArrayInputStream(projectileData);
+                        //     ObjectInputStream objectIn = new ObjectInputStream(byteIn);
+                        //     try {
+                        //         @SuppressWarnings("unchecked") 
+                        //         ArrayList<CharacterType.Projectiles> projectileList 
+                        //         = (ArrayList<CharacterType.Projectiles>) objectIn.readObject();
+
+                                
+                        //         for (CharacterType.Projectiles p : projectileList){
+                        //             if (p2.getCharacterType() instanceof Ranger){
+                        //                 p2.getCharacterType().getProjectiles().add((Ranger.Bullet) p);
+                        //             } else if (p2.getCharacterType() instanceof Wizard){
+                        //                 p2.getCharacterType().getProjectiles().add((Wizard.Orb) p);
+                        //             }
+                        //         }
+
+                        //     } catch (ClassNotFoundException e) {
+                        //         System.out.println("Class not found at RFS.run()");
+                        //     }
+                                    
+                        // }
                         if (p2.getCharacterType().getProjectiles() != null){
                             // a getter method to determine what type of projectile is being sent
                             CharacterType ct = p2.getCharacterType();
@@ -237,15 +253,12 @@ public class GameFrame {
                                     CharacterType.Projectiles b = ((Ranger) ct).new Bullet(projectileX.get(i), projectileY.get(i), weaponRotation);
                                     p2.getCharacterType().getProjectiles().add(b);
                                 } else if (ct instanceof Wizard){
-                                    CharacterType.Projectiles o = ((Wizard) ct). new Orb(projectileX.get(i), projectileY.get(i), weaponRotation);
+                                    CharacterType.Projectiles o = ((Wizard) ct).new Orb(projectileX.get(i), projectileY.get(i), weaponRotation);
                                     p2.getCharacterType().getProjectiles().add(o);
                                 }
                             }
                         }
-
-                        projectileX.clear();
-                        projectileY.clear();
-                    
+                        
                     }   
                 }
             } catch (IOException ex) {
@@ -255,6 +268,8 @@ public class GameFrame {
 
         public void waitServer(){
             try {
+                p2Name = dataIn.readUTF();
+                p2PlayerType = dataIn.readUTF();
                 String message = dataIn.readUTF();
                 System.out.println("Message from Server: " + message);
 
@@ -289,23 +304,42 @@ public class GameFrame {
                         dataOut.writeDouble(p.getY());
                         dataOut.writeDouble(p.getCharacterType().getRotation());
                         
+                        // TODO currently fixing!
                         if (p.getCharacterType().getProjectiles() != null){
-                            dataOut.writeInt(p.getCharacterType().getProjectiles().size());
+                            int currentProjectiles = p.getCharacterType().getProjectiles().size();
+                            dataOut.writeInt(currentProjectiles);
                         
-                            for (int i = 0; i < p.getCharacterType().getProjectiles().size() ; i++){
+                            for (int i = 0; i < currentProjectiles ; i++){
                                 dataOut.writeDouble(p.getCharacterType().getProjectiles().get(i).getX());
                                 dataOut.writeDouble(p.getCharacterType().getProjectiles().get(i).getY());
                             }
                         } else {
                             dataOut.writeInt(0);
                         }
+                    
+                        // converting the projectiles to a byte array.
+                        // TODO not yet working
+                        // if (p.getCharacterType().getProjectiles() != null){
+                        //     dataOut.writeBoolean(true); // checker if the player has projectiles arraylist
+                        //     ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+                        //     ObjectOutputStream objectOut = new ObjectOutputStream(byteOut);
+                        //     objectOut.writeObject(p.getCharacterType().getProjectiles());
+                        //     objectOut.flush();
+                        //     byte[] serializedProjectiles = byteOut.toByteArray();
+
+                        //     dataOut.writeInt(serializedProjectiles.length);
+                        //     dataOut.write(serializedProjectiles);
+
+                        // } else {
+                        //     dataOut.writeBoolean(false); // checker if the CharacterType does not use Projectiles
+                        // }
 
                         dataOut.flush();
 
                     }
 
                     try {
-                        Thread.sleep(15);
+                        Thread.sleep(25);
                     } catch (InterruptedException ex) {
                         System.out.println("InterruptedException from WTS.run()");
                     }
@@ -322,8 +356,21 @@ public class GameFrame {
             socket = new Socket("localhost",45375);
             DataInputStream in = new DataInputStream(socket.getInputStream());
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+            
+            Scanner sc = new Scanner(System.in);
+            System.out.print("Enter Your name: ");
+            name = sc.nextLine();
+            System.out.println("Hello " + name + "!");
+            System.out.println("Enter CharacterType: ");
+            playerType = sc.nextLine();
+
+            sc.close();
+
             playerID = in.readInt();
             System.out.println("You are player # " + playerID);
+            out.writeUTF(name);
+            out.writeUTF(playerType);
+            
             if (playerID == 1){
                 System.out.println("Waiting for other players...");
             }

@@ -41,29 +41,26 @@ public class GameServer {
     private WriteToClient wtc1;
     private WriteToClient wtc2;
 
-    private String p1Name,p2Name;
+    private String p1Name,p2Name,p1CharacterType,p2CharacterType;
     private double p1x,p1y,p2x,p2y,p1rotation,p2rotation;
 
-    private int p1ProjectileCount, p2ProjectileCount;
-    private ArrayList<Double> p1ProjectileX,p1ProjectileY,p2ProjectileX,p2ProjectileY;
+    // if byte arrays are used
+    private boolean p1HasProjectiles, p2HasProjectiles;
+    private int p1ArraySize,p2ArraySize;
+    private byte[] p1ReceivedArray, p2ReceivedArray;
+
+    // if each content of the arraylist is sent instead
+    private int p1ProjectileCount,p2ProjectileCount;
+    private ArrayList<Double> p1ProjectileX, p1ProjectileY, p2ProjectileX, p2ProjectileY;
 
     public GameServer(){
 
         playerCount = 0;
         maxPlayerCount = 2;
 
-        p1Name = "prism";
-        p2Name = "test";
-
-        p1x = 200;
-        p1y = 200;
-        p1rotation = 0;
         p1ProjectileX = new ArrayList<>();
         p1ProjectileY = new ArrayList<>();
 
-        p2x = 400;
-        p2y = 200;
-        p2rotation = 0;
         p2ProjectileX = new ArrayList<>();
         p2ProjectileY = new ArrayList<>();
 
@@ -72,6 +69,7 @@ public class GameServer {
         } catch (IOException ex) {
             System.out.println("IOException from GameServer");
         }
+        
     }
 
     public void allowConnection(){
@@ -85,7 +83,7 @@ public class GameServer {
                 DataOutputStream out = new DataOutputStream(s.getOutputStream());
 
                 playerCount ++;
-                out.writeInt(playerCount); // sends integer to client
+                out.writeInt(playerCount); // sends integer or playerID to client
                 System.out.println("Player # " + playerCount + " has connected.");
                 
                 ReadFromClient rfc = new ReadFromClient(playerCount, in);
@@ -93,10 +91,13 @@ public class GameServer {
 
                 if (playerCount == 1){
                     p1Socket = s;
+                    rfc.receiveInitialValues();
                     rfc1 = rfc;
                     wtc1 = wtc;
+
                 } else {
                     p2Socket = s;
+                    rfc.receiveInitialValues();
                     rfc2 = rfc;
                     wtc2 = wtc;
                     
@@ -122,7 +123,7 @@ public class GameServer {
         }
     }
 
-    class ReadFromClient implements Runnable{
+     class ReadFromClient implements Runnable{
         
         private int playerID;
         private DataInputStream dataIn;
@@ -142,6 +143,14 @@ public class GameServer {
                         p1x = dataIn.readDouble();
                         p1y = dataIn.readDouble();
                         p1rotation = dataIn.readDouble();
+                        // p1HasProjectiles = dataIn.readBoolean();
+    
+                        // if (p1HasProjectiles){
+                        //     p1ArraySize = dataIn.readInt();
+                        //     p1ReceivedArray = new byte[p1ArraySize];
+                        //     dataIn.readFully(p1ReceivedArray);
+                        // }
+
                         p1ProjectileCount = dataIn.readInt();
     
                         if (p1ProjectileCount > 0){
@@ -156,6 +165,14 @@ public class GameServer {
                         p2x = dataIn.readDouble();
                         p2y = dataIn.readDouble();
                         p2rotation = dataIn.readDouble();
+                        // p2HasProjectiles = dataIn.readBoolean();
+
+                        // if (p2HasProjectiles){
+                        //     p2ArraySize = dataIn.readInt();
+                        //     p2ReceivedArray = new byte[p2ArraySize];
+                        //     dataIn.readFully(p2ReceivedArray);
+                        // } 
+
                         p2ProjectileCount = dataIn.readInt();
 
                         if (p2ProjectileCount > 0){
@@ -169,6 +186,21 @@ public class GameServer {
                 }
             } catch (IOException ex) {
                 System.out.println("IOException at RFC.run()");
+            }
+        }
+
+        public void receiveInitialValues(){
+            try {
+                if (playerID == 1){
+                    p1Name = dataIn.readUTF();
+                    p1CharacterType = dataIn.readUTF();
+                } else {
+                    p2Name = dataIn.readUTF();
+                    p2CharacterType = dataIn.readUTF();
+                }
+
+            } catch (IOException ex) {
+                System.out.println("IOException from rfc.RecieveInitialValues()");
             }
         }
 
@@ -194,23 +226,37 @@ public class GameServer {
                         dataOut.writeDouble(p2x);
                         dataOut.writeDouble(p2y);
                         dataOut.writeDouble(p2rotation);
+                        // dataOut.writeBoolean(p2HasProjectiles);
+                        
+                        // if (p2HasProjectiles){
+                        //     dataOut.writeInt(p2ArraySize);
+                        //     dataOut.write(p2ReceivedArray);
+                        // }
+
                         dataOut.writeInt(p2ProjectileCount);
 
                         for (int i = 0; i < p2ProjectileCount ; i++){
                             dataOut.writeDouble(p2ProjectileX.get(i));
                             dataOut.writeDouble(p2ProjectileY.get(i));
                         }
-          
+
                         p2ProjectileX.clear();
                         p2ProjectileY.clear();
+
                         dataOut.flush();
 
                     } else {
-                        
                         dataOut.writeUTF(p1Name);
                         dataOut.writeDouble(p1x);
                         dataOut.writeDouble(p1y);
                         dataOut.writeDouble(p1rotation);
+                        // dataOut.writeBoolean(p1HasProjectiles);
+                        
+                        // if (p1HasProjectiles){
+                        //     dataOut.writeInt(p1ArraySize);
+                        //     dataOut.write(p1ReceivedArray);
+                        // }
+
                         dataOut.writeInt(p1ProjectileCount);
 
                         for (int i = 0; i < p1ProjectileCount ; i++){
@@ -221,11 +267,12 @@ public class GameServer {
                         p1ProjectileX.clear();
                         p1ProjectileY.clear();
 
+
                         dataOut.flush();
                     }
 
                     try {
-                        Thread.sleep(15);
+                        Thread.sleep(25);
                     } catch (InterruptedException ex) {
                         System.out.println("InterruptedException from WTC.run()");
                     }
@@ -237,7 +284,16 @@ public class GameServer {
 
         public void startGame(){
             try {
+                if (playerID == 1){
+                    dataOut.writeUTF(p2Name);
+                    dataOut.writeUTF(p2CharacterType);
+                } else {
+                    dataOut.writeUTF(p1Name);
+                    dataOut.writeUTF(p1CharacterType);
+                }
                 dataOut.writeUTF("All players have connected. Starting Game.");
+                dataOut.flush();
+
             } catch (IOException e) {
                 System.out.println("IOException at WTC.startGame()");
             }
