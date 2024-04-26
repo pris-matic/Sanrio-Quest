@@ -44,15 +44,10 @@ public class GameServer {
     private String p1Name,p2Name,p1CharacterType,p2CharacterType;
     private double p1x,p1y,p2x,p2y,p1rotation,p2rotation;
 
-    // if byte arrays are used
-    private boolean p1HasProjectiles, p2HasProjectiles;
-    private int p1ArraySize,p2ArraySize;
-    private byte[] p1ReceivedArray, p2ReceivedArray;
-
     // if each content of the arraylist is sent instead
     private int p1ProjectileCount,p2ProjectileCount;
     private ArrayList<Double> p1ProjectileX, p1ProjectileY, p2ProjectileX, p2ProjectileY;
-
+    
     public GameServer(){
 
         playerCount = 0;
@@ -123,7 +118,7 @@ public class GameServer {
         }
     }
 
-     class ReadFromClient implements Runnable{
+    class ReadFromClient implements Runnable{
         
         private int playerID;
         private DataInputStream dataIn;
@@ -143,44 +138,37 @@ public class GameServer {
                         p1x = dataIn.readDouble();
                         p1y = dataIn.readDouble();
                         p1rotation = dataIn.readDouble();
-                        // p1HasProjectiles = dataIn.readBoolean();
-    
-                        // if (p1HasProjectiles){
-                        //     p1ArraySize = dataIn.readInt();
-                        //     p1ReceivedArray = new byte[p1ArraySize];
-                        //     dataIn.readFully(p1ReceivedArray);
-                        // }
 
                         p1ProjectileCount = dataIn.readInt();
-    
-                        if (p1ProjectileCount > 0){
-                            for (int i = 0; i < p1ProjectileCount ; i++){
-                                p1ProjectileX.add(dataIn.readDouble());
-                                p1ProjectileY.add(dataIn.readDouble());
-                            }
+                        ArrayList<Double> tempX = new ArrayList<>();
+                        ArrayList<Double> tempY = new ArrayList<>();
+
+                        for (int i = 0; i < p1ProjectileCount ; i++){
+                            tempX.add(dataIn.readDouble());
+                            tempY.add(dataIn.readDouble());
                         }
-                        
+
+                        p1ProjectileX = tempX;
+                        p1ProjectileY = tempY;
+   
                     } else {
                         p2Name = dataIn.readUTF();
                         p2x = dataIn.readDouble();
                         p2y = dataIn.readDouble();
                         p2rotation = dataIn.readDouble();
-                        // p2HasProjectiles = dataIn.readBoolean();
-
-                        // if (p2HasProjectiles){
-                        //     p2ArraySize = dataIn.readInt();
-                        //     p2ReceivedArray = new byte[p2ArraySize];
-                        //     dataIn.readFully(p2ReceivedArray);
-                        // } 
 
                         p2ProjectileCount = dataIn.readInt();
 
-                        if (p2ProjectileCount > 0){
-                            for (int i = 0; i < p2ProjectileCount ; i++){
-                                p2ProjectileX.add(dataIn.readDouble());
-                                p2ProjectileY.add(dataIn.readDouble());
-                            }
+                        ArrayList<Double> tempX = new ArrayList<>();
+                        ArrayList<Double> tempY = new ArrayList<>();
+
+                        for (int i = 0; i < p2ProjectileCount ; i++){
+                            tempX.add(dataIn.readDouble());
+                            tempY.add(dataIn.readDouble());
                         }
+
+                        p2ProjectileX = tempX;
+                        p2ProjectileY = tempY;
 
                     }
                 }
@@ -226,36 +214,23 @@ public class GameServer {
                         dataOut.writeDouble(p2x);
                         dataOut.writeDouble(p2y);
                         dataOut.writeDouble(p2rotation);
-                        // dataOut.writeBoolean(p2HasProjectiles);
-                        
-                        // if (p2HasProjectiles){
-                        //     dataOut.writeInt(p2ArraySize);
-                        //     dataOut.write(p2ReceivedArray);
-                        // }
 
                         dataOut.writeInt(p2ProjectileCount);
+                        System.out.println(p2ProjectileX);
+                        System.out.println(p2ProjectileY);
 
                         for (int i = 0; i < p2ProjectileCount ; i++){
                             dataOut.writeDouble(p2ProjectileX.get(i));
                             dataOut.writeDouble(p2ProjectileY.get(i));
                         }
 
-                        p2ProjectileX.clear();
-                        p2ProjectileY.clear();
-
                         dataOut.flush();
-
+    
                     } else {
                         dataOut.writeUTF(p1Name);
                         dataOut.writeDouble(p1x);
                         dataOut.writeDouble(p1y);
                         dataOut.writeDouble(p1rotation);
-                        // dataOut.writeBoolean(p1HasProjectiles);
-                        
-                        // if (p1HasProjectiles){
-                        //     dataOut.writeInt(p1ArraySize);
-                        //     dataOut.write(p1ReceivedArray);
-                        // }
 
                         dataOut.writeInt(p1ProjectileCount);
 
@@ -264,13 +239,9 @@ public class GameServer {
                             dataOut.writeDouble(p1ProjectileY.get(i));
                         }
 
-                        p1ProjectileX.clear();
-                        p1ProjectileY.clear();
-
-
                         dataOut.flush();
-                    }
 
+                    }
                     try {
                         Thread.sleep(25);
                     } catch (InterruptedException ex) {
