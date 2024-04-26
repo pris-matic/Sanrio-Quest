@@ -1,6 +1,8 @@
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
 The CharacterType abstract class is used to define the 
@@ -38,11 +40,11 @@ public abstract class CharacterType {
     protected int hp, atk, def, maxHp; // stats
     protected CharacterManager cm;
     protected double x,y,rotation;
-    protected BufferedImage front1,front2,left1,left2,right1,right2;
+    protected BufferedImage front1,front2;
     
     protected boolean alive; // determines if hp is greater than 0
     protected boolean attacking; // whether the player is currently attacking
-    
+
     public int getHealth(){
         return hp;
     }
@@ -102,12 +104,13 @@ public abstract class CharacterType {
 
     public abstract void attack();
 
-    public abstract ArrayList<Projectiles> getProjectiles();
+    public abstract CopyOnWriteArrayList<Projectiles> getProjectiles();
 
-    abstract class Projectiles {
+    abstract class Projectiles implements Serializable {
         
         protected double xPos,yPos,initX,initY,projectileRotation, width, height;
         protected int projectileSpeed;
+        protected boolean active;
 
         public void moveProjectileX(){
             this.xPos += projectileSpeed * Math.cos(projectileRotation);
@@ -125,11 +128,23 @@ public abstract class CharacterType {
             this.yPos = position;
         }
 
+        public void setInitialX(double position){
+            this.initX = position;
+        }
+
+        public void setInitialY(double position){
+            this.initY = position;
+        }
+
+        public void setProjectileRotation (double rotate){
+            this.projectileRotation=rotate;
+        }
+
         public double getX(){
             return this.xPos;
         }
 
-        public double getInitX(){
+        public double getInitialX(){
             return this.initX;
         }
 
@@ -137,7 +152,7 @@ public abstract class CharacterType {
             return this.yPos;
         }
 
-        public double getInitY(){
+        public double getInitialY(){
             return this.initY;
         }
 
@@ -149,20 +164,36 @@ public abstract class CharacterType {
             return this.height;
         }
 
+        public boolean isActive(){
+            return active;
+        }
+
+        public void setActive(){
+            if (active){
+                active = false;
+            } else {
+                active = true;
+            }
+        }
+
         public abstract void drawProjectile(Graphics2D g2d);
 
     }
 
     public abstract void attackMovement();
 
-    public void removeProjectiles(ArrayList<Projectiles> projectiles){
+    public void removeProjectiles(CopyOnWriteArrayList<Projectiles> projectiles){
 
-        for  (int i = 0; i < projectiles.size() ; i ++){
-            double x = Math.abs(projectiles.get(i).getX() - projectiles.get(i).getInitX());
-            double y = Math.abs(projectiles.get(i).getY() - projectiles.get(i).getInitY());
-            double pythagorean = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
-            if (pythagorean >= 400){
-                projectiles.remove(i);
+        for (int i = 0; i < projectiles.size() ; i ++){
+            if (projectiles.get(i).isActive()){
+                double x = Math.abs(projectiles.get(i).getX() - projectiles.get(i).getInitialX());
+                double y = Math.abs(projectiles.get(i).getY() - projectiles.get(i).getInitialY());
+                double pythagorean = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+                if (pythagorean >= 500){
+                    projectiles.get(i).setActive();
+                    projectiles.get(i).setProjectileX(-5000);
+                    projectiles.get(i).setProjectileY(-5000);
+                }
             }
         }
     }

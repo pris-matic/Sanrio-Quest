@@ -30,6 +30,9 @@ public abstract class CharacterManager {
     protected double x, y; // player's coordinates
     protected int width, height, speed;
     protected boolean up,down,left,right;
+    protected CharacterType ct; // used by the player
+    protected EnemyType et; // used by the enemies
+    protected String name;
 
     public void moveX(double movement){
         x += movement;
@@ -83,6 +86,22 @@ public abstract class CharacterManager {
         return speed;
     }
 
+    public CharacterType getCharacterType(){
+        return ct;
+    }
+
+    public EnemyType getEnemyType(){
+        return et;
+    }
+
+    public String getName(){
+        return name;
+    }
+
+    public void setName(String n){
+        name = n;
+    }
+
     //TODO do collision later!
     public boolean isCollidingWithWall(Walls wall){
         return !(wall.getX() + wall.getWidth() <= x ||
@@ -92,5 +111,9 @@ public abstract class CharacterManager {
     }
 
     public abstract void drawCharacter(Graphics2D g2d);
+
+    public void wasHit(CharacterType ct, CharacterManager cm){
+        
+    }
 
 }
