@@ -3,6 +3,7 @@ import java.awt.event.*;
 import java.awt.geom.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.Timer;
 
 /**
@@ -31,7 +32,7 @@ of our program.
 
 public class Ranger extends CharacterType {
     
-    private ArrayList<Projectiles> bulletList;
+    private CopyOnWriteArrayList<Projectiles> bulletList;
     private Timer bulletMovement;
 
     public Ranger(CharacterManager cm){
@@ -43,7 +44,10 @@ public class Ranger extends CharacterType {
         alive = true;
 
         this.cm = cm;
-        bulletList = new ArrayList<>();
+        bulletList = new CopyOnWriteArrayList<>();
+        for (int i = 0; i < 5; i ++){
+            bulletList.add(new Bullet(-5000, -5000, 0));
+        }
         attacking = false;
 
     }
@@ -63,8 +67,8 @@ public class Ranger extends CharacterType {
         
         g2d.setColor(Color.GREEN);
 
-        Rectangle2D.Double rangerWep = new Rectangle2D.Double((cm.getX()+cm.getWidth()/2),cm.getY()+15,35,90);
-        g2d.rotate(rotation,(cm.getX()+cm.getWidth()/2),cm.getY()+(cm.getHeight()/2)+10);
+        Rectangle2D.Double rangerWep = new Rectangle2D.Double((cm.getX()+cm.getWidth()/2),cm.getY()+15,20,60);
+        g2d.rotate(rotation,(cm.getX()+cm.getWidth()/2),(cm.getY()+(cm.getHeight()/2))+5);
         g2d.fill(rangerWep);
 
     }
@@ -79,7 +83,7 @@ public class Ranger extends CharacterType {
     @Override
     public void changeRotation(double yPos, double xPos){
 
-        double dy = yPos - ((cm.getY()+(cm.getHeight()/2))+25);
+        double dy = yPos - ((cm.getY()+(cm.getHeight()/2))+5);
         double dx = xPos - (cm.getX()+(cm.getWidth()/2));
         rotation = Math.atan2(dy,dx);
 
@@ -89,9 +93,22 @@ public class Ranger extends CharacterType {
     public void attack(){
 
         attacking = true;
+        
+        for (Projectiles b : bulletList){
+            
+            if (!b.isActive()){
+                
+                b.setInitialX((cm.getX()+(cm.getWidth()/2))-7.5);
+                b.setInitialY((cm.getY()+(cm.getHeight()/2))-7.5);
 
-        if (bulletList.size() < 5){
-            bulletList.add(new Bullet((cm.getX()+(cm.getWidth()/2)) - 15, (cm.getY()+(cm.getHeight()/2)) - 20, rotation));
+                b.setProjectileX((cm.getX()+(cm.getWidth()/2))-7.5);
+                b.setProjectileY((cm.getY()+(cm.getHeight()/2))-7.5);
+                b.setProjectileRotation(rotation);
+                b.setActive();
+                
+                break;
+            } 
+
         }
         attackMovement();
         
@@ -99,19 +116,20 @@ public class Ranger extends CharacterType {
 
     @Override
     public void attackMovement(){
-
         if (bulletMovement == null || !bulletMovement.isRunning()){
             ActionListener moveBullets = new ActionListener() {
 
                 @Override
                 public void actionPerformed(ActionEvent ae) {
-                    
-                    removeProjectiles(bulletList);
-                    
+                        
                     for (int i = 0; i < bulletList.size() ; i++){
-                        bulletList.get(i).moveProjectileX();
-                        bulletList.get(i).moveProjectileY();
+                        if (bulletList.get(i).isActive()){
+                            bulletList.get(i).moveProjectileX();
+                            bulletList.get(i).moveProjectileY();
+                        }
                     }
+
+                    removeProjectiles(bulletList);
 
                     attacking = false;
                 }
@@ -123,7 +141,7 @@ public class Ranger extends CharacterType {
     }
 
     @Override
-    public ArrayList<Projectiles> getProjectiles(){
+    public CopyOnWriteArrayList<Projectiles> getProjectiles(){
         return bulletList;
     }
 
@@ -139,8 +157,10 @@ public class Ranger extends CharacterType {
             projectileSpeed = 5;
             projectileRotation = rotation;
 
-            width = 20;
-            height = 20;
+            width = 15;
+            height = 15;
+            
+            active = false;
         }
 
         @Override

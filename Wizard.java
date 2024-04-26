@@ -4,6 +4,8 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import javax.imageio.ImageIO;
 import javax.swing.Timer;
 
@@ -33,7 +35,7 @@ of our program.
 
 public class Wizard extends CharacterType{
 
-    private ArrayList<Projectiles> orbList;
+    private CopyOnWriteArrayList<Projectiles> orbList;
     private Timer orbMovement;
 
     public Wizard(CharacterManager cm){
@@ -44,7 +46,10 @@ public class Wizard extends CharacterType{
         alive = true;
 
         this.cm = cm;
-        orbList = new ArrayList<>();
+        orbList = new CopyOnWriteArrayList<>();
+        for (int i = 0; i < 3; i ++){
+            orbList.add(new Orb(-5000, -5000, 0));
+        }
         attacking = false;
 
     }
@@ -69,7 +74,7 @@ public class Wizard extends CharacterType{
     public void drawWeapon(Graphics2D g2d) {
         
         g2d.setColor(Color.GREEN);
-        Rectangle2D.Double wizardWep = new Rectangle2D.Double(cm.getX()+(cm.getWidth()*0.7),cm.getY()+30,15,60);
+        Rectangle2D.Double wizardWep = new Rectangle2D.Double(cm.getX()+(cm.getWidth()*0.7),cm.getY()+20,15,60);
         
         // TODO finalize if staff / stick should get rotated
         // g2d.rotate(rotation,cm.getX()+(cm.getWidth()*0.7)+7.5,cm.getY()+75);
@@ -98,11 +103,26 @@ public class Wizard extends CharacterType{
         if (orbList.size() < 3){
             orbList.add(new Orb((cm.getX()+(cm.getWidth()*0.7)+10), cm.getY()+30, rotation));
         }
+
+        for (Projectiles o : orbList){
+            if (!o.isActive()){
+
+                o.setInitialX((cm.getX()+(cm.getWidth()*0.7)+10));
+                o.setInitialY(cm.getY()+30);
+
+                o.setProjectileX((cm.getX()+(cm.getWidth()*0.7)+10));
+                o.setProjectileY(cm.getY()+30);
+                o.setProjectileRotation(rotation);
+                o.setActive();
+                
+                break;
+            }
+        }
         attackMovement();
     }
 
     @Override
-    public ArrayList<Projectiles> getProjectiles(){
+    public CopyOnWriteArrayList<Projectiles> getProjectiles(){
         return orbList;
     }
 

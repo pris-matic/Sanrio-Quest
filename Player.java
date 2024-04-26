@@ -26,10 +26,7 @@ of our program.
 */
 
 public class Player extends CharacterManager{
-    
-    private String name;
-    private CharacterType ct;
-    
+      
     public Player(String name, String characterType, int xPos, int yPos){
         
         this.name = name;
@@ -50,9 +47,9 @@ public class Player extends CharacterManager{
         left = false;
         right = false;
 
-        height = 100;
-        width = 75;
-        speed = 5;
+        width = 60;
+        height = 80;
+        speed = 4;
         
     }
 
@@ -68,19 +65,7 @@ public class Player extends CharacterManager{
    
     }
 
-    public CharacterType getCharacterType(){
-        return ct;
-    }
-
-    public String getName(){
-        return name;
-    }
-
-    public void setName(String n){
-        name = n;
-    }
-
-    public void trackMovement(String direction, boolean move){
+    public void moveCharacter(String direction, boolean move){
     
         if (direction.equalsIgnoreCase("up")){
             up = move;
