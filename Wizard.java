@@ -135,12 +135,12 @@ public class Wizard extends CharacterType{
                 @Override
                 public void actionPerformed(ActionEvent ae) {
                     
-                    removeProjectiles(orbList);
-                    
                     for (int i = 0; i < orbList.size() ; i++){
                         orbList.get(i).moveProjectileX();
                         orbList.get(i).moveProjectileY();
                     }
+                    
+                    removeProjectiles(orbList);
                     
                     attacking = false;
                     
@@ -167,6 +167,8 @@ public class Wizard extends CharacterType{
 
             width = 15;
             height = 15;
+
+            active = false;
 
         }
         

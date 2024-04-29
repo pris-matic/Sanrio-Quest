@@ -4,6 +4,8 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import javax.imageio.ImageIO;
 import javax.swing.Timer;
 
@@ -58,14 +60,14 @@ public class Melee extends CharacterType {
     @Override
     public void drawWeapon(Graphics2D g2d) {
         g2d.setColor(Color.GREEN);
-        Rectangle2D.Double meleeWep = new Rectangle2D.Double(cm.getX()+(cm.getWidth()/2),cm.getY()+(cm.getHeight()/2),115,25);
+        Rectangle2D.Double meleeWep = new Rectangle2D.Double(cm.getX()+(cm.getWidth()/2),cm.getY()+(cm.getHeight()/2),95,25);
         g2d.rotate(rotation,cm.getX()+(cm.getWidth()/2),cm.getY()+(cm.getHeight()/2)+12.5);
         g2d.fill(meleeWep);
     }
 
     @Override
     public void drawAttacks(Graphics2D g2d){
-        
+        // TODO fix later
     }
 
     @Override
@@ -84,9 +86,8 @@ public class Melee extends CharacterType {
         attackMovement();
     }
     
-    //TODO what possible projectiles
     @Override
-    public ArrayList<Projectiles> getProjectiles(){
+    public CopyOnWriteArrayList<Projectiles> getProjectiles(){
         return null;
     }
 
