@@ -40,7 +40,7 @@ public class GameCanvas extends JComponent {
        
         this.p = p;
         this.p2 = p2;
-        t = new Timer(15, new PlayerTimer());
+        t = new Timer(10, new PlayerTimer());
         t.start();
         this.setPreferredSize(new Dimension(800,600));
 
@@ -96,10 +96,6 @@ public class GameCanvas extends JComponent {
 
     class PlayerTimer implements ActionListener{
         
-        public PlayerTimer(){
-
-        }
-
         @Override
         public void actionPerformed(ActionEvent ae) {
             if (p.isMovingUp()){
