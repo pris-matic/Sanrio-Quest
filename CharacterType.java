@@ -1,7 +1,5 @@
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -106,7 +104,7 @@ public abstract class CharacterType {
 
     public abstract CopyOnWriteArrayList<Projectiles> getProjectiles();
 
-    abstract class Projectiles implements Serializable {
+    abstract class Projectiles {
         
         protected double xPos,yPos,initX,initY,projectileRotation, width, height;
         protected int projectileSpeed;
