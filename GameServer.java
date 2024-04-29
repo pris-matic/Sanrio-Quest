@@ -53,6 +53,12 @@ public class GameServer {
         playerCount = 0;
         maxPlayerCount = 2;
 
+        p1x = 200;
+        p1y = 200;
+
+        p2x = 400;
+        p2y = 200;
+
         p1ProjectileX = new ArrayList<>();
         p1ProjectileY = new ArrayList<>();
 
