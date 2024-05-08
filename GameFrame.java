@@ -63,6 +63,7 @@ public class GameFrame {
         frame.setTitle("Dungeon Crawler Testing | " + p.getName());
 
         gc = new GameCanvas(p,p2);
+        gc.startThread();
         frame.add(gc);
         frame.pack();
 
@@ -79,8 +80,14 @@ public class GameFrame {
             p = new Player(name,playerType,200,200);
             p2 = new Player(p2Name,p2PlayerType,400,200);
         } else {
-            p2 = new Player(p2Name,p2PlayerType,200,200);
-            p = new Player(name,playerType,400,200);
+            
+            // TODO revert if multi
+            // p2 = new Player(p2Name,p2PlayerType,200,200);
+            // p = new Player(name,playerType,400,200);
+
+            // TODO single player debugging!
+            p2 = new Player("test","ranger",200,200);
+            p = new Player("player","ranger",400,200);
         }
     }
 
@@ -118,9 +125,11 @@ public class GameFrame {
     class ConfigureWeapon extends MouseAdapter{
 
         private CharacterType ct;
+        private Camera c;
 
         public ConfigureWeapon(){
             ct = p.getCharacterType();
+            c = gc.getCamera();
         }
 
         @Override
@@ -131,14 +140,14 @@ public class GameFrame {
         @Override
         public void mouseDragged(MouseEvent me) {
             if (!ct.isAttacking()){
-                ct.changeRotation(me.getY(),me.getX());
+                ct.changeRotation(me.getY() + c.getY(),me.getX() + c.getX());
             }
         }
 
         @Override
         public void mouseMoved(MouseEvent me) {
             if (!ct.isAttacking()){
-                ct.changeRotation(me.getY(),me.getX());
+                ct.changeRotation(me.getY() + c.getY(),me.getX() + c.getX());
             }
         }
 
