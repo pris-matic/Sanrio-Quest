@@ -38,10 +38,14 @@ public abstract class CharacterType {
     protected int hp, atk, def, maxHp; // stats
     protected CharacterManager cm;
     protected double x,y,rotation;
-    protected BufferedImage front1,front2;
-    
+
     protected boolean alive; // determines if hp is greater than 0
     protected boolean attacking; // whether the player is currently attacking
+    
+    // variables related to character images
+    protected int updateSpriteCounter = 0; 
+    protected int spriteValue = 1;
+    protected BufferedImage idle,front1,front2,back1,back2,left1,left2,right1,right2;
 
     public int getHealth(){
         return hp;
@@ -92,7 +96,9 @@ public abstract class CharacterType {
 
     public abstract String showCharacterType();
 
-    public abstract BufferedImage getCharacterImages();
+    public abstract void getImages();
+
+    public abstract BufferedImage displayImage();
 
     public abstract void drawWeapon(Graphics2D g2d);
 
