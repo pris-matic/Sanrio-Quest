@@ -51,7 +51,7 @@ public class Wizard extends CharacterType{
             orbList.add(new Orb(-5000, -5000, 0));
         }
         attacking = false;
-
+        getImages();
     }
 
     @Override
@@ -59,9 +59,14 @@ public class Wizard extends CharacterType{
         return "Wizard";
     }
 
+    @Override
+    public void getImages(){
+
+    }
+
     // TODO unfinished | only a test run
     @Override
-    public BufferedImage getCharacterImages(){
+    public BufferedImage displayImage(){
         try {
             front1 = ImageIO.read(new File("man.jpg"));
         } catch (IOException ex) {
