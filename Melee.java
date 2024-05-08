@@ -45,6 +45,7 @@ public class Melee extends CharacterType {
         this.cm = cm;
 
         attacking = false;
+        getImages();
     }
 
     @Override
@@ -53,7 +54,12 @@ public class Melee extends CharacterType {
     }
 
     @Override
-    public BufferedImage getCharacterImages(){
+    public void getImages(){
+
+    }
+
+    @Override
+    public BufferedImage displayImage(){
         return null;
     }
 

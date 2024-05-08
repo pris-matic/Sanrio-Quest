@@ -2,8 +2,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.concurrent.CopyOnWriteArrayList;
+import javax.imageio.ImageIO;
 import javax.swing.Timer;
 
 /**
@@ -49,6 +50,7 @@ public class Ranger extends CharacterType {
             bulletList.add(new Bullet(-5000, -5000, 0));
         }
         attacking = false;
+        getImages();
 
     }
 
@@ -58,8 +60,72 @@ public class Ranger extends CharacterType {
     }
 
     @Override
-    public BufferedImage getCharacterImages(){
-        return null;
+    public void getImages(){
+
+        try {
+
+            idle = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/idle_ranger.png"));
+            front1 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/front1_ranger.png"));
+            front2 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/front2_ranger.png"));
+            back1 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/back1_ranger.png"));
+            back2 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/back2_ranger.png"));
+            left1 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/left1_ranger.png"));
+            left2 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/left2_ranger.png"));
+            right1 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/right1_ranger.png"));
+            right2 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/right2_ranger.png"));
+
+        } catch (IOException e) {
+            System.out.println("IOException in CharacterType.getImages()");
+        }
+    }
+
+    @Override
+    public BufferedImage displayImage(){
+        
+        BufferedImage img = null;
+
+        if (cm.isMovingDown()){
+            if (spriteValue == 1){
+                img = front1;
+            }
+            if (spriteValue == 2){
+                img = front2;
+            }
+        } else if (cm.isMovingLeft()){
+            if (spriteValue == 1){
+                img = left1;
+            }
+            if (spriteValue == 2){
+                img = left2;
+            }
+        } else if (cm.isMovingRight()){
+            if (spriteValue == 1){
+                img = right1;
+            }
+            if (spriteValue == 2){
+                img = right2;    
+            }         
+        } else if (cm.isMovingUp()){
+            if (spriteValue == 1){
+                img = back1;
+            }
+            if (spriteValue == 2){
+                img = back2;
+            }
+        } else {
+            img = idle;
+        }
+
+        updateSpriteCounter ++;
+        if (updateSpriteCounter > 15){
+            if (spriteValue == 1){
+                spriteValue = 2;
+            } else {
+                spriteValue = 1;
+            }
+            updateSpriteCounter = 0;
+        }
+        return img;
     }
 
     @Override
