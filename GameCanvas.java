@@ -32,7 +32,11 @@ public class GameCanvas extends JComponent implements Runnable {
     
     private Player p;
     private Player p2;
-    private ArrayList<Walls> gameBackground;
+    private Enemy e;
+    //private ArrayList<Enemy> e;
+    private HealthBar p1HealthBorder,p1HealthBar,p2HealthBorder,p2HealthBar;;
+
+    private static ArrayList<Walls> gameBackground;
     private Thread gameThread;
     private final int FPS;
     private Camera camera;
@@ -46,6 +50,7 @@ public class GameCanvas extends JComponent implements Runnable {
 
         gameBackground = new ArrayList<>();
         camera = new Camera((p.getX()+(p.getWidth()/2)),(p.getY()+(p.getHeight()/2)),p);
+        setDoubleBuffered(true);
 
         Walls a = new Walls(0, 0, 1200, 50);
         Walls b = new Walls(0, 0, 50, 800);
@@ -57,18 +62,35 @@ public class GameCanvas extends JComponent implements Runnable {
         gameBackground.add(c);
         gameBackground.add(d);
 
+        e = new Enemy("Fairy", 800, 600);
+
+        p1HealthBorder = new HealthBar(10, 10, 200, 35,
+            p.getCharacterType().getMaxHealth(), Color.BLACK, false,p);
+
+        p1HealthBar = new HealthBar(10, 10, 200, 35, 
+            p.getCharacterType().getMaxHealth(),Color.GREEN.darker(),true,p);
+
+        p2HealthBorder = new HealthBar(590, 10, 200, 35,
+            p2.getCharacterType().getMaxHealth(), Color.BLACK, false,p2);
+
+        p2HealthBar = new HealthBar(590, 10, 200, 35, 
+            p2.getCharacterType().getMaxHealth(),Color.GREEN.darker(),true,p2);
     }
 
     @Override
     protected void paintComponent(Graphics g){
-        Graphics2D g2d = (Graphics2D) g;
 
+        Graphics2D g2d = (Graphics2D) g;
+        
         RenderingHints rh = new RenderingHints(
             RenderingHints.KEY_ANTIALIASING,
             RenderingHints.VALUE_ANTIALIAS_ON);
 
         rh.put(RenderingHints.KEY_INTERPOLATION, 
-            RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+
+        rh.put(RenderingHints.KEY_ALPHA_INTERPOLATION, 
+            RenderingHints.VALUE_ALPHA_INTERPOLATION_SPEED);
 
         g2d.setRenderingHints(rh);
 
@@ -81,7 +103,6 @@ public class GameCanvas extends JComponent implements Runnable {
             w.draw(g2d);
         }
 
-        
         // draws the character and its weapon
         p.drawCharacter(g2d);
         saveState = g2d.getTransform();
@@ -100,7 +121,17 @@ public class GameCanvas extends JComponent implements Runnable {
         g2d.setTransform(saveState);
         p2.getCharacterType().drawAttacks(g2d);
 
+        e.drawCharacter(g2d);
+        saveState = g2d.getTransform();
+        e.getCharacterType().drawAttacks(g2d);
+        
         g2d.setTransform(reset);
+
+        p1HealthBar.draw(g2d);
+        p1HealthBorder.draw(g2d);
+        p2HealthBar.draw(g2d);
+        p2HealthBorder.draw(g2d);
+
         g2d.dispose();
 
     } 
@@ -118,33 +149,106 @@ public class GameCanvas extends JComponent implements Runnable {
         return collision;
     }
 
+    public void checkCollisionWithProjectiles(){
+        p.wasHit(p, e);
+        e.wasHit(e, p);
+    }
+
     public void checkMovement(){
 
         if (p.isMovingUp()){
             p.moveY(-(p.getSpeed()));
+            if (p.isCollidingWithEntity(p, e)){
+                p.moveY(p.getSpeed());
+                p.getCharacterType().takeDamage(e.getCharacterType().getAttack());
+            }
             if ((checkCollision(p))){
                 p.moveY(p.getSpeed());
+                
             }
         }
         if (p.isMovingDown()){
             p.moveY(p.getSpeed());
+            if (p.isCollidingWithEntity(p, e)){
+                p.moveY(-(p.getSpeed()));
+                p.getCharacterType().takeDamage(e.getCharacterType().getAttack());
+            }
             if ((checkCollision(p))){
                 p.moveY(-(p.getSpeed()));
             }
         }
         if (p.isMovingLeft()){
             p.moveX(-(p.getSpeed()));
+            if (p.isCollidingWithEntity(p, e)){
+                p.moveX(p.getSpeed());
+                p.getCharacterType().takeDamage(e.getCharacterType().getAttack());
+            }
             if ((checkCollision(p))){
                 p.moveX(p.getSpeed());
             }
         }
         if (p.isMovingRight()){
             p.moveX(p.getSpeed());
+            if (p.isCollidingWithEntity(p, e)){
+                p.moveX(-(p.getSpeed()));
+                p.getCharacterType().takeDamage(e.getCharacterType().getAttack());
+            }
             if ((checkCollision(p))){
                 p.moveX(-(p.getSpeed()));
             }
         }
+
+        p.getCharacterType().displayImage();
         
+    }
+
+    public void checkEnemyMovement(){
+
+        e.moveAutomatically();
+
+        if (e.isMovingUp()){
+            e.moveY((-(e.getSpeed())));
+            if (e.isCollidingWithEntity(e, p)){
+                e.moveY((e.getSpeed()));
+                p.getCharacterType().takeDamage(e.getCharacterType().getAttack());
+            }
+            if (checkCollision(e)){
+                e.moveY((e.getSpeed()));
+            }
+            
+        }
+        if (e.isMovingDown()){
+            e.moveY((e.getSpeed()));
+            if (e.isCollidingWithEntity(e, p)){
+                e.moveY((-(e.getSpeed())));
+                p.getCharacterType().takeDamage(e.getCharacterType().getAttack());
+            }
+            if (checkCollision(e)){
+                e.moveY((-(e.getSpeed())));
+            }
+        }
+        if (e.isMovingLeft()){
+            e.moveX(-(e.getSpeed()));
+            if (e.isCollidingWithEntity(e, p)){
+                e.moveX(e.getSpeed());
+                p.getCharacterType().takeDamage(e.getCharacterType().getAttack());
+            }
+            if (checkCollision(e)){
+                e.moveX(e.getSpeed());
+            }
+        }
+        if (e.isMovingRight()){
+            e.moveX(e.getSpeed());
+            if (e.isCollidingWithEntity(e, p)){
+                e.moveX(-(e.getSpeed()));
+                p.getCharacterType().takeDamage(e.getCharacterType().getAttack());
+            }
+            if (checkCollision(e)){
+                e.moveX(-(e.getSpeed()));
+            }
+        }
+
+        e.getCharacterType().displayImage();
     }
 
     public void startThread(){
@@ -171,7 +275,10 @@ public class GameCanvas extends JComponent implements Runnable {
 
             if (delta >= 1){
                 checkMovement();
+                checkEnemyMovement();
                 updateCamera();
+                refreshHealth();
+                checkCollisionWithProjectiles();
                 repaint();
                 delta --;
             } 
@@ -184,6 +291,71 @@ public class GameCanvas extends JComponent implements Runnable {
 
     public Camera getCamera(){
         return camera;
+    }
+
+    public static ArrayList<Walls> getWalls(){
+        return gameBackground;
+    }
+
+    public void refreshHealth(){
+        p1HealthBar.updateHealth((int) p.getCharacterType().getHealth());
+        p2HealthBar.updateHealth((int) p2.getCharacterType().getHealth());
+    }
+
+    class HealthBar {
+        private int x, y, width, height;
+        private double currentHealth,maxHealth;
+        private Color color;
+        private Player player;
+        private boolean fill;
+
+        public HealthBar(int x, int y, int w, int h, double hp, Color c,boolean f, Player player){
+            this.x = x;
+            this.y = y;
+            width = w;
+            height = h;
+            currentHealth = hp;
+            maxHealth = hp;
+            color = c;
+            fill = f;
+            this.player = player;
+        }   
+
+        public void draw(Graphics2D g2d){
+            
+            g2d.setColor(color);
+            if (fill){
+                double percentage = (currentHealth/maxHealth) * 200;
+                Rectangle2D.Double health = new Rectangle2D.Double(this.x,this.y,(int) percentage,this.height);
+                g2d.fill(health);
+            } else {
+                Rectangle2D.Double hollow = new Rectangle2D.Double(this.x,this.y,this.width,this.height);
+                g2d.draw(hollow);
+
+                g2d.setColor(Color.BLACK);
+
+                Font healthFont = new Font("Comic Sans MS", Font.BOLD,13);
+                g2d.setFont(healthFont);
+                String text = player.getName()+ "'s Health: " + player.getCharacterType().getHealth() 
+                + "/" + player.getCharacterType().getMaxHealth();
+            
+                // center-align the text based on how long it is
+                FontMetrics metrics = g2d.getFontMetrics(healthFont);
+                int textWidth = metrics.stringWidth(text);
+                int textHeight = metrics.getHeight();
+
+                int centerX = this.x + (int) ((this.width - textWidth) / 2.0);
+                int centerY = this.y + (this.height - textHeight) / 2 + metrics.getAscent();
+
+                g2d.drawString(text, centerX, centerY);
+            }
+
+        }
+
+        public void updateHealth(int value){
+            currentHealth = value;
+        }
+        
     }
 
 }
