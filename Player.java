@@ -1,6 +1,4 @@
 import java.awt.*;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
 
 /**
 The Player class is the one that will be interacted
@@ -57,30 +55,12 @@ public class Player extends CharacterManager{
     @Override
     public void drawCharacter(Graphics2D g2d){
        
-        // Rectangle2D.Double playerSprite = new Rectangle2D.Double(x, y, width, height);
-        // g2d.setColor(Color.BLACK);
-        // g2d.fill(playerSprite);
-    
-        g2d.drawImage(ct.displayImage(),(int) x,(int) y,width,height,null);  
+        g2d.drawImage(ct.useImage(),(int) x,(int) y,width,height,null);  
         g2d.setColor(Color.BLACK);
         g2d.drawString(name, (int) x, (int)y);
 
     }
 
-    public void moveCharacter(String direction, boolean move){
     
-        if (direction.equalsIgnoreCase("up")){
-            up = move;
-        }
-        if (direction.equalsIgnoreCase("down")){
-            down = move;
-        }
-        if (direction.equalsIgnoreCase("left")){
-            left = move;
-        }
-        if (direction.equalsIgnoreCase("right")){
-            right = move;
-        }
-    }
 
 }
