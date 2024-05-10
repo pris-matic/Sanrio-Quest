@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
@@ -59,8 +60,8 @@ public class GameFrame {
     public void setUpGUI(){
 
         createPlayers();
-    
-        frame.setTitle("Dungeon Crawler Testing | " + p.getName());
+
+        frame.setTitle("Sanrio Quest | " + p.getName());
 
         gc = new GameCanvas(p,p2);
         gc.startThread();
@@ -71,7 +72,6 @@ public class GameFrame {
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
-        
     }
 
     private void createPlayers(){
@@ -90,7 +90,7 @@ public class GameFrame {
             p = new Player("player","ranger",400,200);
         }
     }
-
+    
     // Controls
 
     class KeysPressed extends AbstractAction {
@@ -122,7 +122,7 @@ public class GameFrame {
 
     }
 
-    class ConfigureWeapon extends MouseAdapter{
+    class ConfigureWeapon extends MouseAdapter {
 
         private CharacterType ct;
         private Camera c;
@@ -213,13 +213,15 @@ public class GameFrame {
                     for (int i = 0; i < projectileCount ; i++){
                         projectileX.add(dataIn.readDouble());
                         projectileY.add(dataIn.readDouble());
-                    }  
+                    }
+                    int playerImage = dataIn.readInt();
                     
                     if(p2 != null){
                         p2.setName(playerName);
                         p2.setX(playerX);
                         p2.setY(playerY);
                         p2.getCharacterType().setRotation(weaponRotation);
+                        p2.getCharacterType().setImage(playerImage);
                         
                         if (p2.getCharacterType().getProjectiles() != null){
                             // a getter method to determine what type of projectile is being sent by the other player
@@ -282,7 +284,7 @@ public class GameFrame {
                         dataOut.writeDouble(p.getX());
                         dataOut.writeDouble(p.getY());
                         dataOut.writeDouble(p.getCharacterType().getRotation());
-                        
+                            
                         if (p.getCharacterType().getProjectiles() != null){
                             int currentProjectiles = p.getCharacterType().getProjectiles().size();
                             dataOut.writeInt(currentProjectiles);
@@ -294,13 +296,15 @@ public class GameFrame {
                         } else {
                             dataOut.writeInt(0);
                         }
+
+                        dataOut.writeInt(p.getCharacterType().getSpriteNumber());
                     
                         dataOut.flush();
 
                     }
 
                     try {
-                        Thread.sleep(25);
+                        Thread.sleep(35);
                     } catch (InterruptedException ex) {
                         System.out.println("InterruptedException from WTS.run()");
                     }
@@ -314,11 +318,13 @@ public class GameFrame {
 
     public void connectToServer(){
         try {
-            socket = new Socket("localhost",45375);
+            Scanner sc = new Scanner(System.in);
+            System.out.print("Enter Host IP Address: ");
+            String hostAddress = sc.nextLine();
+            socket = new Socket(hostAddress,45375);
             DataInputStream in = new DataInputStream(socket.getInputStream());
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-            
-            Scanner sc = new Scanner(System.in);
+             
             System.out.print("Enter Your name: ");
             name = sc.nextLine();
             System.out.println("Hello " + name + "!");
