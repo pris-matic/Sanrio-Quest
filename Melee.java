@@ -1,9 +1,7 @@
 import java.awt.*;
 import java.awt.geom.*;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.awt.event.*;
-import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.imageio.ImageIO;
@@ -38,6 +36,8 @@ public class Melee extends CharacterType {
     private Timer swordTimer;
 
     public Melee(CharacterManager cm){
+        
+        maxHp = 200;
         hp = 200;
         atk = 4;
         def = 10;
@@ -46,6 +46,8 @@ public class Melee extends CharacterType {
 
         attacking = false;
         getImages();
+
+        img = idle;
     }
 
     @Override
@@ -56,11 +58,31 @@ public class Melee extends CharacterType {
     @Override
     public void getImages(){
 
-    }
+        try {
 
-    @Override
-    public BufferedImage displayImage(){
-        return null;
+            idle = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/idle_ranger.png"));
+            front1 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/front1_ranger.png"));
+            front2 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/front2_ranger.png"));
+            back1 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/back1_ranger.png"));
+            back2 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/back2_ranger.png"));
+            left1 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/left1_ranger.png"));
+            left2 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/left2_ranger.png"));
+            right1 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/right1_ranger.png"));
+            right2 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/right2_ranger.png"));
+
+            imageList[0] = idle;
+            imageList[1] = front1;
+            imageList[2] = front2;
+            imageList[3] = left1;
+            imageList[4] = left2;
+            imageList[5] = right1;
+            imageList[6] = right2;
+            imageList[7] = back1;
+            imageList[8] = back2;
+
+        } catch (IOException e) {
+            System.out.println("IOException in CharacterType.getImages()");
+        }
     }
 
     @Override
@@ -73,7 +95,7 @@ public class Melee extends CharacterType {
 
     @Override
     public void drawAttacks(Graphics2D g2d){
-        // TODO fix later
+
     }
 
     @Override

@@ -1,11 +1,8 @@
 import java.awt.*;
 import java.awt.geom.*;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.awt.event.*;
-import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
-
 import javax.imageio.ImageIO;
 import javax.swing.Timer;
 
@@ -39,6 +36,8 @@ public class Wizard extends CharacterType{
     private Timer orbMovement;
 
     public Wizard(CharacterManager cm){
+        
+        maxHp = 125;
         hp = 125;
         atk = 7;
         def = 5;
@@ -52,6 +51,8 @@ public class Wizard extends CharacterType{
         }
         attacking = false;
         getImages();
+
+        img = idle;
     }
 
     @Override
@@ -62,27 +63,38 @@ public class Wizard extends CharacterType{
     @Override
     public void getImages(){
 
-    }
-
-    // TODO unfinished | only a test run
-    @Override
-    public BufferedImage displayImage(){
         try {
-            front1 = ImageIO.read(new File("man.jpg"));
-        } catch (IOException ex) {
-            ex.printStackTrace();
+
+            idle = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/idle_ranger.png"));
+            front1 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/front1_ranger.png"));
+            front2 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/front2_ranger.png"));
+            back1 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/back1_ranger.png"));
+            back2 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/back2_ranger.png"));
+            left1 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/left1_ranger.png"));
+            left2 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/left2_ranger.png"));
+            right1 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/right1_ranger.png"));
+            right2 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/right2_ranger.png"));
+
+            imageList[0] = idle;
+            imageList[1] = front1;
+            imageList[2] = front2;
+            imageList[3] = left1;
+            imageList[4] = left2;
+            imageList[5] = right1;
+            imageList[6] = right2;
+            imageList[7] = back1;
+            imageList[8] = back2;
+
+        } catch (IOException e) {
+            System.out.println("IOException in CharacterType.getImages()");
         }
-        return front1;
     }
 
     @Override
     public void drawWeapon(Graphics2D g2d) {
         
         g2d.setColor(Color.GREEN);
-        Rectangle2D.Double wizardWep = new Rectangle2D.Double(cm.getX()+(cm.getWidth()*0.7),cm.getY()+20,15,60);
-        
-        // TODO finalize if staff / stick should get rotated
-        // g2d.rotate(rotation,cm.getX()+(cm.getWidth()*0.7)+7.5,cm.getY()+75);
+        Rectangle2D.Double wizardWep = new Rectangle2D.Double(cm.getX()+(cm.getWidth()*0.65),cm.getY()+30,15,50);
         g2d.fill(wizardWep);
     }
 
@@ -97,7 +109,7 @@ public class Wizard extends CharacterType{
     public void changeRotation(double yPos, double xPos){
         
         double dy = yPos - (cm.getY()+75);
-        double dx = xPos - (cm.getX()+(cm.getWidth()*0.7)+7.5);
+        double dx = xPos - (cm.getX()+(cm.getWidth()*0.65)+7.5);
         rotation = Math.atan2(dy,dx);
 
     }
@@ -112,11 +124,11 @@ public class Wizard extends CharacterType{
         for (Projectiles o : orbList){
             if (!o.isActive()){
 
-                o.setInitialX((cm.getX()+(cm.getWidth()*0.7)+10));
-                o.setInitialY(cm.getY()+30);
+                o.setInitialX((cm.getX()+(cm.getWidth()*0.65)+10));
+                o.setInitialY(cm.getY()+35);
 
-                o.setProjectileX((cm.getX()+(cm.getWidth()*0.7)+10));
-                o.setProjectileY(cm.getY()+30);
+                o.setProjectileX((cm.getX()+(cm.getWidth()*0.65)+10));
+                o.setProjectileY(cm.getY()+35);
                 o.setProjectileRotation(rotation);
                 o.setActive();
                 

@@ -1,7 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.imageio.ImageIO;
@@ -38,6 +37,7 @@ public class Ranger extends CharacterType {
 
     public Ranger(CharacterManager cm){
         
+        maxHp = 75;
         hp = 75;
         atk = 10;
         def = 3;
@@ -51,6 +51,8 @@ public class Ranger extends CharacterType {
         }
         attacking = false;
         getImages();
+
+        img = idle;
 
     }
 
@@ -74,58 +76,19 @@ public class Ranger extends CharacterType {
             right1 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/right1_ranger.png"));
             right2 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/right2_ranger.png"));
 
+            imageList[0] = idle;
+            imageList[1] = front1;
+            imageList[2] = front2;
+            imageList[3] = left1;
+            imageList[4] = left2;
+            imageList[5] = right1;
+            imageList[6] = right2;
+            imageList[7] = back1;
+            imageList[8] = back2;
+
         } catch (IOException e) {
             System.out.println("IOException in CharacterType.getImages()");
         }
-    }
-
-    @Override
-    public BufferedImage displayImage(){
-        
-        BufferedImage img = null;
-
-        if (cm.isMovingDown()){
-            if (spriteValue == 1){
-                img = front1;
-            }
-            if (spriteValue == 2){
-                img = front2;
-            }
-        } else if (cm.isMovingLeft()){
-            if (spriteValue == 1){
-                img = left1;
-            }
-            if (spriteValue == 2){
-                img = left2;
-            }
-        } else if (cm.isMovingRight()){
-            if (spriteValue == 1){
-                img = right1;
-            }
-            if (spriteValue == 2){
-                img = right2;    
-            }         
-        } else if (cm.isMovingUp()){
-            if (spriteValue == 1){
-                img = back1;
-            }
-            if (spriteValue == 2){
-                img = back2;
-            }
-        } else {
-            img = idle;
-        }
-
-        updateSpriteCounter ++;
-        if (updateSpriteCounter > 15){
-            if (spriteValue == 1){
-                spriteValue = 2;
-            } else {
-                spriteValue = 1;
-            }
-            updateSpriteCounter = 0;
-        }
-        return img;
     }
 
     @Override
