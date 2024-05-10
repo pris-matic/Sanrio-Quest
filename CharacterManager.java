@@ -1,4 +1,5 @@
 import java.awt.Graphics2D;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
 The CharacterManager abstract class is used to define the 
@@ -102,7 +103,6 @@ public abstract class CharacterManager {
         name = n;
     }
 
-    //TODO do collision later!
     public boolean isCollidingWithWall(Walls wall){
         return !(wall.getX() + wall.getWidth() <= x ||
         wall.getX() >= x + width ||
@@ -112,8 +112,56 @@ public abstract class CharacterManager {
 
     public abstract void drawCharacter(Graphics2D g2d);
 
-    public void wasHit(CharacterType ct, CharacterManager cm){
+    //TODO check collision logic between bullets and entities (CharacterType | CharacterManager)
+    public boolean isCollidingWithBullet(CharacterManager cm, CopyOnWriteArrayList<CharacterType.Projectiles> projectiles){
         
+        boolean collision = false;
+
+        for (CharacterType.Projectiles p : projectiles){
+            if (p.isCollidingWith(cm)){
+                collision = true;
+                p.setActive();
+                p.setProjectileX(-5000);
+                p.setProjectileY(-5000);
+                break;
+            }
+        }
+        return collision;
+    }
+    
+    public void wasHit(CharacterManager attacker, CharacterManager defender){
+        if (defender.isCollidingWithBullet(defender, attacker.getCharacterType().getProjectiles())){
+            defender.getCharacterType().takeDamage(attacker.getCharacterType().getAttack());
+        }
+    }
+
+    public boolean isCollidingWithEntity(CharacterManager player, CharacterManager enemy){
+       
+        boolean collision = false;
+
+        collision = !(player.getX() + player.getWidth() <= enemy.getX()||
+        player.getX()>= enemy.getX() + enemy.getWidth() ||
+        player.getY() + player.getHeight() <= enemy.getY()||
+        player.getY()>= enemy.getY() + enemy.getHeight());
+
+        return collision;
+
+    }
+
+    public void moveCharacter(String direction, boolean move){
+    
+        if (direction.equalsIgnoreCase("up")){
+            up = move;
+        }
+        if (direction.equalsIgnoreCase("down")){
+            down = move;
+        }
+        if (direction.equalsIgnoreCase("left")){
+            left = move;
+        }
+        if (direction.equalsIgnoreCase("right")){
+            right = move;
+        }
     }
 
 }
