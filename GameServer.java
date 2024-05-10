@@ -31,7 +31,7 @@ public class GameServer {
     private ServerSocket ss;
     private int playerCount;
     private int maxPlayerCount;
-
+    
     private Socket p1Socket;
     private Socket p2Socket;
     
@@ -43,8 +43,9 @@ public class GameServer {
 
     private String p1Name,p2Name,p1CharacterType,p2CharacterType;
     private double p1x,p1y,p2x,p2y,p1rotation,p2rotation;
+    private int p1CurrentImage,p2CurrentImage;
 
-    // if each content of the arraylist is sent instead
+    // contents of the arraylist sent as primitive types
     private int p1ProjectileCount,p2ProjectileCount;
     private ArrayList<Double> p1ProjectileX, p1ProjectileY, p2ProjectileX, p2ProjectileY;
     
@@ -154,6 +155,8 @@ public class GameServer {
                             tempY.add(dataIn.readDouble());
                         }
 
+                        p1CurrentImage = dataIn.readInt();
+
                         p1ProjectileX = tempX;
                         p1ProjectileY = tempY;
    
@@ -162,7 +165,7 @@ public class GameServer {
                         p2x = dataIn.readDouble();
                         p2y = dataIn.readDouble();
                         p2rotation = dataIn.readDouble();
-
+                        
                         p2ProjectileCount = dataIn.readInt();
 
                         ArrayList<Double> tempX = new ArrayList<>();
@@ -172,6 +175,8 @@ public class GameServer {
                             tempX.add(dataIn.readDouble());
                             tempY.add(dataIn.readDouble());
                         }
+
+                        p2CurrentImage = dataIn.readInt();
 
                         p2ProjectileX = tempX;
                         p2ProjectileY = tempY;
@@ -222,13 +227,13 @@ public class GameServer {
                         dataOut.writeDouble(p2rotation);
 
                         dataOut.writeInt(p2ProjectileCount);
-                        System.out.println(p2ProjectileX);
-                        System.out.println(p2ProjectileY);
 
                         for (int i = 0; i < p2ProjectileCount ; i++){
                             dataOut.writeDouble(p2ProjectileX.get(i));
                             dataOut.writeDouble(p2ProjectileY.get(i));
                         }
+
+                        dataOut.writeInt(p2CurrentImage);
 
                         dataOut.flush();
     
@@ -245,11 +250,13 @@ public class GameServer {
                             dataOut.writeDouble(p1ProjectileY.get(i));
                         }
 
+                        dataOut.writeInt(p1CurrentImage);
+
                         dataOut.flush();
 
                     }
                     try {
-                        Thread.sleep(25);
+                        Thread.sleep(35);
                     } catch (InterruptedException ex) {
                         System.out.println("InterruptedException from WTC.run()");
                     }
