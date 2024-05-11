@@ -49,6 +49,12 @@ public class GameServer {
     private int p1ProjectileCount,p2ProjectileCount;
     private ArrayList<Double> p1ProjectileX, p1ProjectileY, p2ProjectileX, p2ProjectileY;
     
+    /** 
+        Sets up a GameServer instance, with initial values for the players.
+        A maximum of two players can join the server, once one disconnects, the server must be restarted.
+        <p></p> ArrayLists that will temporarily contain the projectiles received and will also
+        be sent out are also created.
+    **/
     public GameServer(){
 
         playerCount = 0;
@@ -74,6 +80,14 @@ public class GameServer {
         
     }
 
+    /**
+        Allows players to connect to the server. The threads for sending and
+        receiving information from the client/s will also be instantiated.
+        <p></p> When the max player count is achieved, it will not allow
+        any other connection.
+        @see GameServer.ReadFromClient
+        @see GameServer.WriteToClient
+    **/
     public void allowConnection(){
 
         try {
@@ -125,17 +139,35 @@ public class GameServer {
         }
     }
 
+    /**
+        The ReadFromClient class is responsible for receiving information from the client.
+        It stores the information from each player, and will be sent out again afterward.
+
+        @author Anthony B. Deocadiz Jr. (232166)
+        @author Ramona Miekaela S. Laciste (233403)
+        @version March 16, 2024
+    **/
     class ReadFromClient implements Runnable{
         
         private int playerID;
         private DataInputStream dataIn;
 
+        /**
+            Constructs a new instance of the ReadFromClient class that
+            asks for the player's ID.
+            @param pid is the player ID
+            @param in is the DataInputStream that will receive the data.
+        **/
         public ReadFromClient(int pid, DataInputStream in){
             playerID = pid;
             dataIn = in;
             System.out.println("RFC"  + playerID + " created.");
         }
 
+        /**
+            Continuously stores information from the client.
+            The information is stored depending on the PlayerID of the client.
+        **/
         @Override
         public void run(){
             try {
@@ -188,6 +220,12 @@ public class GameServer {
             }
         }
 
+        /**
+            Gets the Initial values from the players through the waitServer() method
+            it is used to initialize the GameFrame for both players.
+            @see GameFrame#createPlayers()
+            @see GameFrame.ReadFromServer#waitServer()
+        **/
         public void receiveInitialValues(){
             try {
                 if (playerID == 1){
@@ -205,17 +243,34 @@ public class GameServer {
 
     }
 
+    /**
+        The WriteToClient class is responsible for sending information to the client.
+        The stored the information from each player will be sent to the other one.
+
+        @author Anthony B. Deocadiz Jr. (232166)
+        @author Ramona Miekaela S. Laciste (233403)
+        @version March 16, 2024
+    **/
     class WriteToClient implements Runnable{
 
         private int playerID;
         private DataOutputStream dataOut;
 
+        /**
+            Instantiates a WriteToClient object that will send out information
+            to the players.
+            @param pid is the player's ID
+            @param out is the DataOutputStream responsible in sending out information.
+        **/
         public WriteToClient(int pid, DataOutputStream out){
             playerID = pid;
             dataOut = out;
             System.out.println("WTC"  + playerID + " created.");
         }
 
+        /**
+            Continuously sends out information to the clients.
+        **/
         @Override
         public void run(){
             try {
@@ -266,6 +321,11 @@ public class GameServer {
             }
         }
 
+        /**
+            Starts the Game for both players after the server has received the intial information.
+            @see GameFrame.ReadFromServer#waitServer()
+            @see GameServer.ReadFromClient#receiveInitialValues()
+        **/
         public void startGame(){
             try {
                 if (playerID == 1){

@@ -46,9 +46,13 @@ public class Player extends CharacterManager{
         left = false;
         right = false;
 
+        invincible = false;
+        invincibleCooldown = 0;
+
         width = 60;
         height = 90;
         speed = 4;
+
         
     }
 
@@ -61,4 +65,19 @@ public class Player extends CharacterManager{
 
     }
 
+    public void isCollidingWithBullet(Enemy enemy){
+
+        if (enemy.getEnemyType().getProjectiles() != null){
+            for (EnemyType.EnemyProjectiles p : enemy.getEnemyType().getProjectiles()){
+                if (p.isCollidingWith(this)){;
+                    p.setActive();
+                    p.setProjectileX(-5000);
+                    p.setProjectileY(-5000);
+                    this.getCharacterType().takeDamage(enemy.getEnemyType().getAttack());
+                    break;
+                }
+            }
+        }
+    }
+    
 }

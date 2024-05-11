@@ -65,15 +65,16 @@ public class Wizard extends CharacterType{
 
         try {
 
-            idle = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/idle_ranger.png"));
-            front1 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/front1_ranger.png"));
-            front2 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/front2_ranger.png"));
-            back1 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/back1_ranger.png"));
-            back2 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/back2_ranger.png"));
-            left1 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/left1_ranger.png"));
-            left2 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/left2_ranger.png"));
-            right1 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/right1_ranger.png"));
-            right2 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/right2_ranger.png"));
+            idle = ImageIO.read(getClass().getResourceAsStream("/Sprites/WizardSprites/idle_wizard.png"));
+            front1 = ImageIO.read(getClass().getResourceAsStream("/Sprites/WizardSprites/front1_wizard.png"));
+            front2 = ImageIO.read(getClass().getResourceAsStream("/Sprites/WizardSprites/front2_wizard.png"));
+            back1 = ImageIO.read(getClass().getResourceAsStream("/Sprites/WizardSprites/back1_wizard.png"));
+            back2 = ImageIO.read(getClass().getResourceAsStream("/Sprites/WizardSprites/back2_wizard.png"));
+            left1 = ImageIO.read(getClass().getResourceAsStream("/Sprites/WizardSprites/left1_wizard.png"));
+            left2 = ImageIO.read(getClass().getResourceAsStream("/Sprites/WizardSprites/left2_wizard.png"));
+            right1 = ImageIO.read(getClass().getResourceAsStream("/Sprites/WizardSprites/right1_wizard.png"));
+            right2 = ImageIO.read(getClass().getResourceAsStream("/Sprites/WizardSprites/right2_wizard.png"));
+            weaponImg = ImageIO.read(getClass().getResourceAsStream("/Sprites/Weapons/staff.png"));
 
             imageList[0] = idle;
             imageList[1] = front1;
@@ -93,9 +94,7 @@ public class Wizard extends CharacterType{
     @Override
     public void drawWeapon(Graphics2D g2d) {
         
-        g2d.setColor(Color.GREEN);
-        Rectangle2D.Double wizardWep = new Rectangle2D.Double(cm.getX()+(cm.getWidth()*0.65),cm.getY()+30,15,50);
-        g2d.fill(wizardWep);
+        g2d.drawImage(weaponImg, (int) (cm.getX()+(cm.getWidth()*0.65)), (int) (cm.getY()+30), 15, 50, null);
     }
 
     @Override

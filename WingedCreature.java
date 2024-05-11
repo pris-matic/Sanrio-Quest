@@ -1,24 +1,26 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
-import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import javax.imageio.ImageIO;
 import javax.swing.Timer;
 
-public class Fairy extends CharacterType{
+public class WingedCreature extends EnemyType{
     
-    private CopyOnWriteArrayList<Projectiles> starsList;
+    private CopyOnWriteArrayList<EnemyProjectiles> starsList;
     private int shooterCooldown;
     private Timer autoShooter,starMovement;
 
-    public Fairy(CharacterManager cm){
+    public WingedCreature(CharacterManager cm){
 
         this.cm = cm;
 
         maxHp = 100;
         hp = 100;
         atk = 6;
-        def = 6;
+        def = 2;
 
         alive = true;
        
@@ -26,34 +28,43 @@ public class Fairy extends CharacterType{
         height = 55;
         
         starsList = new CopyOnWriteArrayList<>();
-        for (int i = 0; i < 2; i ++){
+        for (int i = 0; i < 3; i ++){
             starsList.add(new Stars(-5000, -5000, 0));
         }
 
         getImages();
 
-        img = idle;
+        img = front1;
 
-        shooterCooldown = 2000;
+        shooterCooldown = 1500;
 
+    }
+
+    @Override
+    public String showEnemyType() {
+        return "Winged Creature";
     }
 
     @Override
     public void getImages() {
-        // TODO Auto-generated method stub
+        try {
+            front1 = ImageIO.read(getClass().getResourceAsStream("/Sprites/EnemySprites/WingedCreature/front1_winged.png"));
+            front2 = ImageIO.read(getClass().getResourceAsStream("/Sprites/EnemySprites/WingedCreature/front2_winged.png"));
+
+            imageList[0] = front1;
+            imageList[1] = front2;
+            
+        } catch (IOException e) {
+            System.out.println("IOException in EnemyType.getImages()");
+        }
     }
 
     @Override
     public void drawAttacks(Graphics2D g2d) {
-        for (Projectiles ep : starsList){
+        for (EnemyProjectiles ep : starsList){
             ep.drawProjectile(g2d);
         }
         attack();
-    }
-
-    @Override
-    public void changeRotation(double yPos, double xPos) {
-        rotation = Math.atan2(yPos,xPos);
     }
 
     @Override
@@ -66,7 +77,7 @@ public class Fairy extends CharacterType{
 
                     @Override
                     public void actionPerformed(ActionEvent ae) {
-                        for (Projectiles ep : starsList){
+                        for (EnemyProjectiles ep : starsList){
                             if (!ep.isActive()){
                                 
                                 ep.setInitialX((cm.getX()+(cm.getWidth()/2))-7.5);
@@ -117,11 +128,11 @@ public class Fairy extends CharacterType{
     }
 
     @Override
-    public CopyOnWriteArrayList<Projectiles> getProjectiles() {
+    public CopyOnWriteArrayList<EnemyProjectiles> getProjectiles() {
         return starsList;
     }
 
-    class Stars extends Projectiles {
+    class Stars extends EnemyProjectiles {
 
         public Stars(double x, double y, double rotation){
             xPos = x;
@@ -148,14 +159,4 @@ public class Fairy extends CharacterType{
 
     }
 
-    @Override
-    public String showCharacterType() {
-        return "Fairy";
-    }
-
-    @Override
-    public void drawWeapon(Graphics2D g2d) {
-        // TODO Auto-generated method stub
-    }
-    
 }

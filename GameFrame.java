@@ -1,5 +1,4 @@
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
@@ -47,6 +46,10 @@ public class GameFrame {
     private ReadFromServer rfs;
     private WriteToServer wts;
     
+    /**
+        Instantiates the GameFrame for the player and
+        gets the contentpane as well.
+    **/
     public GameFrame(){
 
         frame = new JFrame();
@@ -57,6 +60,9 @@ public class GameFrame {
     
     // GUI
 
+    /**
+        Sets up the GUI that contains the GameCanvas
+    **/
     public void setUpGUI(){
 
         createPlayers();
@@ -74,6 +80,11 @@ public class GameFrame {
         frame.setVisible(true);
     }
 
+    /** 
+        Sets up the players after receiving information from the network
+        it is only called locally, inside the SetUpGUI() method
+        @see #setUpGUI()
+    **/
     private void createPlayers(){
         
         if (playerID == 1){
@@ -82,25 +93,43 @@ public class GameFrame {
         } else {
             
             // TODO revert if multi
-            // p2 = new Player(p2Name,p2PlayerType,200,200);
-            // p = new Player(name,playerType,400,200);
+            p2 = new Player(p2Name,p2PlayerType,200,200);
+            p = new Player(name,playerType,400,200);
 
             // TODO single player debugging!
-            p2 = new Player("test","ranger",200,200);
-            p = new Player("player","ranger",400,200);
+            // p2 = new Player("test","wizard",200,200);
+            // p = new Player("player","wizard",400,200);
         }
     }
     
     // Controls
 
+    /**
+        The KeysPressed inner class is responsible for performing actions
+        when the <code> Player </code> presses specific buttons. It is 
+        then called in one of the GameFrame's methods.
+
+        @author Anthony B. Deocadiz Jr. (232166)
+        @author Ramona Miekaela S. Laciste (233403)
+        @version March 24, 2024
+        @see GameFrame#addControls()
+    **/
     class KeysPressed extends AbstractAction {
 
         private String direction;
 
+        /**
+            Construct a KeysPressed object with a given direction
+            @param dir is the direction
+        **/
         public KeysPressed(String dir){
             direction = dir;
         }
 
+        /**
+            Perform action based on which key was pressed.
+            @param ae is the action done
+        **/
         @Override
         public void actionPerformed(ActionEvent ae) {
             p.moveCharacter(direction, true);
@@ -108,13 +137,32 @@ public class GameFrame {
         
     }
 
+    /**
+        The KeysReleased inner class is responsible for performing actions
+        when the <code> Player </code> releases specific buttons. It is 
+        then called in one of the GameFrame's methods.
+
+        @author Anthony B. Deocadiz Jr. (232166)
+        @author Ramona Miekaela S. Laciste (233403)
+        @version March 24, 2024
+        @see GameFrame#addControls()
+    **/
     class KeysReleased extends AbstractAction {
 
         private String direction;
 
+        /**
+            Construct a KeysReleased object with a given direction
+            @param dir is the direction
+        **/
         public KeysReleased(String dir){
             direction = dir;
         }
+
+        /**
+            Perform action based on which key was released.
+            @param ae is the action done
+        **/
         @Override
         public void actionPerformed(ActionEvent ae) {
             p.moveCharacter(direction, false);
@@ -122,21 +170,46 @@ public class GameFrame {
 
     }
 
+    /**
+        The ConfigureWeapon inner class is responsible for performing actions
+        when the <code> Player </code> clicks or move the mouse. It is 
+        then called in one of the GameFrame's methods.
+
+        @author Anthony B. Deocadiz Jr. (232166)
+        @author Ramona Miekaela S. Laciste (233403)
+        @version March 31, 2024
+        @see GameFrame#addControls()
+    **/
     class ConfigureWeapon extends MouseAdapter {
 
         private CharacterType ct;
         private Camera c;
 
+        /**
+            Instantiates a ConfigureWeapon object that
+            calls both the characterType of the player, and the Camera
+            used.
+            @see Player
+            @see Camera
+        **/
         public ConfigureWeapon(){
             ct = p.getCharacterType();
             c = gc.getCamera();
         }
 
+        /**
+            Allows the <code> Player </code> to fire projectiles, or move its weapon.
+            @param me is the action done.
+        **/
         @Override
         public void mouseClicked(MouseEvent me) {
             ct.attack();
         }
 
+        /**
+            Allows the <code> Player </code> to aim their weapon by rotating it.
+            @param me is the action done.
+        **/
         @Override
         public void mouseDragged(MouseEvent me) {
             if (!ct.isAttacking()){
@@ -144,6 +217,10 @@ public class GameFrame {
             }
         }
 
+        /**
+            Allows the <code> Player </code> to aim their weapon by rotating it.
+            @param me is the action done.
+        **/
         @Override
         public void mouseMoved(MouseEvent me) {
             if (!ct.isAttacking()){
@@ -153,6 +230,15 @@ public class GameFrame {
 
     }
 
+    /**
+        Maps the controls to the JFrame. It then reflects to the <code> Player </code> and is drawn
+        inside the <code> GameCanvas </code>.
+        <p></p> The configurations for the controls are done by the inner classes of the
+        <code> GameFrame </code> class
+        @see GameFrame.KeysPressed
+        @see GameFrame.KeysReleased
+        @see GameFrame.ConfigureWeapon
+    **/
     public void addControls(){
 
         ActionMap am = gamePane.getActionMap();
@@ -185,16 +271,36 @@ public class GameFrame {
 
     // Networking / Server Handling
 
+    /**
+        The ReadFromServer class allows the player to receive information
+        the <code> GameServer</code> provides them with. This is where the information of the
+        other player that the <code> GameCanvas </code> class will draw will
+        be taken from.
+
+        @author Anthony B. Deocadiz Jr. (232166)
+        @author Ramona Miekaela S. Laciste (233403)
+        @version March 24, 2024
+        @see GameCanvas
+        @see GameServer
+    **/
     class ReadFromServer implements Runnable {
 
         private DataInputStream dataIn;
 
+        /**
+            Sets up a ReadFromServer object for the player
+            @param in is the DataInputStream that will receive data
+        **/
         public ReadFromServer(DataInputStream in){
             dataIn = in;
 
             System.out.println("RFS initialized");
         }
 
+        /** 
+            Continuously receives information from the server and updates the
+            game.
+        **/
         @Override
         public void run() {
             try {
@@ -247,6 +353,10 @@ public class GameFrame {
             }
         }
 
+        /**
+            Gets the initial information of the other player. This acts as a
+            "go" signal to start the game.
+        **/
         public void waitServer(){
             try {
                 p2Name = dataIn.readUTF();
@@ -265,15 +375,33 @@ public class GameFrame {
         }
     }
 
+    /**
+        The WriteToServer class allows the player to send information to
+        the <code> GameServer</code>. The information of the
+        curent player will be sent to the other player through this class.
+
+        @author Anthony B. Deocadiz Jr. (232166)
+        @author Ramona Miekaela S. Laciste (233403)
+        @version March 24, 2024
+        @see GameServer
+    **/
     class WriteToServer implements Runnable {
 
         private DataOutputStream dataOut;
 
+        /**
+            Sets up a WriteToServer object that will send out information
+            @param out is the DataOutputStream responsible in sending out necessary information
+        **/
         public WriteToServer(DataOutputStream out){
             dataOut = out;
             System.out.println("WTS initialized");
         }
 
+        /**
+            Continuously sends out information to the server, which will be received
+            by the other player.
+        **/
         @Override
         public void run(){
             try {
@@ -316,6 +444,11 @@ public class GameFrame {
         }
     }
 
+    /**
+        Allows the player to connect to a server to send and receive data from.
+        The user will enter the Server / Host's IP address, along with their name
+        and their desired <code>CharacterType</code>.
+    **/
     public void connectToServer(){
         try {
             Scanner sc = new Scanner(System.in);

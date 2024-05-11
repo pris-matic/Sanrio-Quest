@@ -66,15 +66,16 @@ public class Ranger extends CharacterType {
 
         try {
 
-            idle = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/idle_ranger.png"));
-            front1 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/front1_ranger.png"));
-            front2 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/front2_ranger.png"));
-            back1 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/back1_ranger.png"));
-            back2 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/back2_ranger.png"));
-            left1 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/left1_ranger.png"));
-            left2 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/left2_ranger.png"));
-            right1 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/right1_ranger.png"));
-            right2 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/right2_ranger.png"));
+            idle = ImageIO.read(getClass().getResourceAsStream("/Sprites/RangerSprites/idle_ranger.png"));
+            front1 = ImageIO.read(getClass().getResourceAsStream("/Sprites/RangerSprites/front1_ranger.png"));
+            front2 = ImageIO.read(getClass().getResourceAsStream("/Sprites/RangerSprites/front2_ranger.png"));
+            back1 = ImageIO.read(getClass().getResourceAsStream("/Sprites/RangerSprites/back1_ranger.png"));
+            back2 = ImageIO.read(getClass().getResourceAsStream("/Sprites/RangerSprites/back2_ranger.png"));
+            left1 = ImageIO.read(getClass().getResourceAsStream("/Sprites/RangerSprites/left1_ranger.png"));
+            left2 = ImageIO.read(getClass().getResourceAsStream("/Sprites/RangerSprites/left2_ranger.png"));
+            right1 = ImageIO.read(getClass().getResourceAsStream("/Sprites/RangerSprites/right1_ranger.png"));
+            right2 = ImageIO.read(getClass().getResourceAsStream("/Sprites/RangerSprites/right2_ranger.png"));
+            weaponImg = ImageIO.read(getClass().getResourceAsStream("/Sprites/Weapons/slingshot.png"));
 
             imageList[0] = idle;
             imageList[1] = front1;
@@ -93,12 +94,8 @@ public class Ranger extends CharacterType {
 
     @Override
     public void drawWeapon(Graphics2D g2d) {
-        
-        g2d.setColor(Color.GREEN);
 
-        Rectangle2D.Double rangerWep = new Rectangle2D.Double((cm.getX()+cm.getWidth()/2),cm.getY()+15,20,60);
-        g2d.rotate(rotation,(cm.getX()+cm.getWidth()/2),(cm.getY()+(cm.getHeight()/2))+5);
-        g2d.fill(rangerWep);
+        g2d.drawImage(weaponImg, (int) (cm.getX()+cm.getWidth()*11/20), (int) (cm.getY()+(cm.getHeight()/2)), 30, 40, null);
 
     }
 
@@ -112,8 +109,8 @@ public class Ranger extends CharacterType {
     @Override
     public void changeRotation(double yPos, double xPos){
 
-        double dy = yPos - ((cm.getY()+(cm.getHeight()/2))+5);
-        double dx = xPos - (cm.getX()+(cm.getWidth()/2));
+        double dy = yPos - (cm.getY()+(cm.getHeight()/2)+20);
+        double dx = xPos - ((cm.getX()+cm.getWidth()*11/20)+15);
         rotation = Math.atan2(dy,dx);
 
     }
@@ -127,11 +124,11 @@ public class Ranger extends CharacterType {
             
             if (!b.isActive()){
                 
-                b.setInitialX((cm.getX()+(cm.getWidth()/2))-7.5);
-                b.setInitialY((cm.getY()+(cm.getHeight()/2))-7.5);
+                b.setInitialX((cm.getX()+(cm.getWidth()/2))+7.5);
+                b.setInitialY((cm.getY()+(cm.getHeight()/2)));
 
-                b.setProjectileX((cm.getX()+(cm.getWidth()/2))-7.5);
-                b.setProjectileY((cm.getY()+(cm.getHeight()/2))-7.5);
+                b.setProjectileX((cm.getX()+(cm.getWidth()/2))+7.5);
+                b.setProjectileY((cm.getY()+(cm.getHeight()/2)));
                 b.setProjectileRotation(rotation);
                 b.setActive();
                 
@@ -194,7 +191,7 @@ public class Ranger extends CharacterType {
 
         @Override
         public void drawProjectile(Graphics2D g2d){
-            g2d.setColor(Color.BLUE);
+            g2d.setColor(Color.GRAY);
             Ellipse2D.Double bullet = new Ellipse2D.Double(xPos,yPos,this.width,this.height);
             g2d.fill(bullet);
         }

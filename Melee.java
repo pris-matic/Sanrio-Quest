@@ -1,5 +1,4 @@
 import java.awt.*;
-import java.awt.geom.*;
 import java.io.*;
 import java.awt.event.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -39,7 +38,7 @@ public class Melee extends CharacterType {
         
         maxHp = 200;
         hp = 200;
-        atk = 4;
+        atk = 5;
         def = 10;
 
         this.cm = cm;
@@ -48,6 +47,7 @@ public class Melee extends CharacterType {
         getImages();
 
         img = idle;
+
     }
 
     @Override
@@ -60,15 +60,16 @@ public class Melee extends CharacterType {
 
         try {
 
-            idle = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/idle_ranger.png"));
-            front1 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/front1_ranger.png"));
-            front2 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/front2_ranger.png"));
-            back1 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/back1_ranger.png"));
-            back2 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/back2_ranger.png"));
-            left1 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/left1_ranger.png"));
-            left2 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/left2_ranger.png"));
-            right1 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/right1_ranger.png"));
-            right2 = ImageIO.read(getClass().getResourceAsStream("/CharacterSprites/RangerSprites/right2_ranger.png"));
+            idle = ImageIO.read(getClass().getResourceAsStream("/Sprites/MeleeSprites/idle_melee.png"));
+            front1 = ImageIO.read(getClass().getResourceAsStream("/Sprites/MeleeSprites/front1_melee.png"));
+            front2 = ImageIO.read(getClass().getResourceAsStream("/Sprites/MeleeSprites/front2_melee.png"));
+            back1 = ImageIO.read(getClass().getResourceAsStream("/Sprites/MeleeSprites/back1_melee.png"));
+            back2 = ImageIO.read(getClass().getResourceAsStream("/Sprites/MeleeSprites/back2_melee.png"));
+            left1 = ImageIO.read(getClass().getResourceAsStream("/Sprites/MeleeSprites/left1_melee.png"));
+            left2 = ImageIO.read(getClass().getResourceAsStream("/Sprites/MeleeSprites/left2_melee.png"));
+            right1 = ImageIO.read(getClass().getResourceAsStream("/Sprites/MeleeSprites/right1_melee.png"));
+            right2 = ImageIO.read(getClass().getResourceAsStream("/Sprites/MeleeSprites/right2_melee.png"));
+            weaponImg = ImageIO.read(getClass().getResourceAsStream("/Sprites/Weapons/sword.png"));
 
             imageList[0] = idle;
             imageList[1] = front1;
@@ -87,10 +88,10 @@ public class Melee extends CharacterType {
 
     @Override
     public void drawWeapon(Graphics2D g2d) {
-        g2d.setColor(Color.GREEN);
-        Rectangle2D.Double meleeWep = new Rectangle2D.Double(cm.getX()+(cm.getWidth()/2),cm.getY()+(cm.getHeight()/2),95,25);
-        g2d.rotate(rotation,cm.getX()+(cm.getWidth()/2),cm.getY()+(cm.getHeight()/2)+12.5);
-        g2d.fill(meleeWep);
+  
+        g2d.rotate(rotation + (Math.toRadians(-90)),(cm.getX()+(cm.getWidth()/2)),cm.getY()+(cm.getHeight()*2/3));
+        g2d.drawImage(weaponImg, (int) (cm.getX()+(cm.getWidth()/2)-12), (int) (cm.getY()+(cm.getHeight()*2/3)), 25, 95, null);
+
     }
 
     @Override
@@ -101,7 +102,7 @@ public class Melee extends CharacterType {
     @Override
     public void changeRotation(double yPos, double xPos){
         
-        double dy = yPos - (cm.getY()+(cm.getHeight()/2)+12.5);
+        double dy = yPos - (cm.getY()+(cm.getHeight()*2/3));
         double dx = xPos - (cm.getX()+(cm.getWidth()/2));
         rotation = Math.atan2(dy,dx);
 
