@@ -108,14 +108,19 @@ public abstract class EnemyType {
     /**
         A simple damage calculation whether certain conditions are met.
         It only divides the damage that the <code>CharacterType</code> will deal.
+        <p></p> before dealing damage, it checks whether the enemy had recently
+        received damage.
         @param damage is the damage the <code>EnemyType</code> object will take.
         @see CharacterType
         @see #getMaxHealth()
     **/
     public void takeDamage(double damage){
-        hp -= damage / def;
-        if (hp <= 0){
-            alive = false;
+        if (!cm.isInvincible()){
+            hp -= damage / def;
+            cm.setInvincibility();
+            if (hp <= 0){
+                alive = false;
+            }
         }
     }
 
@@ -123,7 +128,7 @@ public abstract class EnemyType {
         Flips the current boolean value of the alive variable.
         Determines whether the enemy instance should be moved inside the
         playing field.
-        @see #alive
+        @see #isAlive()
     **/
     public void setAlive(){
         if (alive){
@@ -131,6 +136,16 @@ public abstract class EnemyType {
         } else {
             alive = true;
         }
+    }
+
+    /**
+        Restores the health of the enemy whenever they are
+        to be summoned again inside the playing field.
+        @see #getMaxHealth()
+        @see #setAlive()
+    **/
+    public void setHealthToMaximum(){
+        hp = maxHp;
     }
 
     /**

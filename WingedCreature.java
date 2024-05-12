@@ -17,10 +17,10 @@ public class WingedCreature extends EnemyType{
 
         this.cm = cm;
 
-        maxHp = 100;
-        hp = 100;
-        atk = 6;
-        def = 2;
+        maxHp = 50;
+        hp = 50;
+        atk = 10;
+        def = 1;
 
         alive = true;
        
@@ -87,7 +87,6 @@ public class WingedCreature extends EnemyType{
                                 ep.setProjectileY((cm.getY()+(cm.getHeight()/2))-7.5);
                                 ep.setProjectileRotation(rotation);
                                 ep.setActive();
-                                System.out.println("Shooting | attack()");
                                 break;
                             } 
                         }
@@ -152,7 +151,7 @@ public class WingedCreature extends EnemyType{
 
         @Override
         public void drawProjectile(Graphics2D g2d) {
-            g2d.setColor(new Color(255,205,60));
+            g2d.setColor(new Color(197, 158, 1));
             Ellipse2D.Double star = new Ellipse2D.Double(xPos,yPos,this.width,this.height);
             g2d.fill(star);
         }

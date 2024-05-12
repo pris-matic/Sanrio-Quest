@@ -42,7 +42,7 @@ public class GameServer {
     private WriteToClient wtc2;
 
     private String p1Name,p2Name,p1CharacterType,p2CharacterType;
-    private double p1x,p1y,p2x,p2y,p1rotation,p2rotation;
+    private double p1x,p1y,p2x,p2y,p1rotation,p2rotation,p1Health,p2Health;
     private int p1CurrentImage,p2CurrentImage;
 
     // contents of the arraylist sent as primitive types
@@ -188,6 +188,7 @@ public class GameServer {
                         }
 
                         p1CurrentImage = dataIn.readInt();
+                        p1Health = dataIn.readDouble();
 
                         p1ProjectileX = tempX;
                         p1ProjectileY = tempY;
@@ -209,6 +210,7 @@ public class GameServer {
                         }
 
                         p2CurrentImage = dataIn.readInt();
+                        p2Health = dataIn.readDouble();
 
                         p2ProjectileX = tempX;
                         p2ProjectileY = tempY;
@@ -289,6 +291,7 @@ public class GameServer {
                         }
 
                         dataOut.writeInt(p2CurrentImage);
+                        dataOut.writeDouble(p2Health);
 
                         dataOut.flush();
     
@@ -306,6 +309,7 @@ public class GameServer {
                         }
 
                         dataOut.writeInt(p1CurrentImage);
+                        dataOut.writeDouble(p1Health);
 
                         dataOut.flush();
 

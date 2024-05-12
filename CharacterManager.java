@@ -138,18 +138,43 @@ public abstract class CharacterManager {
         return right;
     }
 
-    // TODO finalize this first
+    /**
+        Checks whether the player is currently invincible in
+        taking any form of damage.
+        @return true if the player's invincible, false otherwise.
+        @see CharacterType#takeDamage(double)
+    **/
     public boolean isInvincible(){
         return invincible;
     }
 
+    /** 
+        Sets the object to be invincible after taking damage.
+        @see CharacterType#takeDamage(double)
+        @see EnemyType#takeDamage(double)
+    **/
     public void setInvincibility(){
-        if (invincible){
-            invincible = false;
-        } else {
-            invincible = true;
+        invincible = true;
+        if (getCharacterType() != null){ // IFrames for the players
+            invincibleCooldown = 60;
+        } else if (getEnemyType() != null){ // IFrames for the enemies
+            invincibleCooldown = 30;
         }
     }
+
+    /** 
+        Updates the cooldown of the invincibility frames of the player.
+        it it tied to the number of times the GameCanvas gets repainted.
+        @see GameCanvas#run()
+    **/
+    public void reduceTimer(){
+        if (invincibleCooldown > 0){
+            invincibleCooldown --;
+            if (invincibleCooldown == 0){
+                invincible = false;
+            }
+        }
+    } 
 
     /**
         Gets the speed of the object.
@@ -213,7 +238,7 @@ public abstract class CharacterManager {
         @param g2d is the Graphics2D object that will be drawing the character
     **/
     public abstract void drawCharacter(Graphics2D g2d);
-    
+
     /**
         Determines whether two instances of the <code>CharacterManager</code> are colliding
         with each other.
@@ -243,17 +268,46 @@ public abstract class CharacterManager {
     **/
     public void moveCharacter(String direction, boolean move){
     
-        if (direction.equalsIgnoreCase("up")){
-            up = move;
-        }
-        if (direction.equalsIgnoreCase("down")){
-            down = move;
-        }
-        if (direction.equalsIgnoreCase("left")){
-            left = move;
-        }
-        if (direction.equalsIgnoreCase("right")){
-            right = move;
+        if (getCharacterType() != null){
+            if (ct.isAlive()){
+                if (direction.equalsIgnoreCase("up")){
+                    up = move;
+                }
+                if (direction.equalsIgnoreCase("down")){
+                    down = move;
+                }
+                if (direction.equalsIgnoreCase("left")){
+                    left = move;
+                }
+                if (direction.equalsIgnoreCase("right")){
+                    right = move;
+                }
+            } else {
+                up = false;
+                down = false;
+                left = false;
+                right = false;
+            }
+        } else if (getEnemyType() != null){
+            if (et.isAlive()){
+                if (direction.equalsIgnoreCase("up")){
+                    up = move;
+                }
+                if (direction.equalsIgnoreCase("down")){
+                    down = move;
+                }
+                if (direction.equalsIgnoreCase("left")){
+                    left = move;
+                }
+                if (direction.equalsIgnoreCase("right")){
+                    right = move;
+                }
+            } else {
+                up = false;
+                down = false;
+                left = false;
+                right = false;
+            }
         }
     }
 

@@ -118,23 +118,25 @@ public class Ranger extends CharacterType {
     @Override
     public void attack(){
 
-        attacking = true;
+        if (alive){
+            attacking = true;
         
-        for (Projectiles b : bulletList){
-            
-            if (!b.isActive()){
+            for (Projectiles b : bulletList){
                 
-                b.setInitialX((cm.getX()+(cm.getWidth()/2))+7.5);
-                b.setInitialY((cm.getY()+(cm.getHeight()/2)));
+                if (!b.isActive()){
+                    
+                    b.setInitialX((cm.getX()+(cm.getWidth()/2))+7.5);
+                    b.setInitialY((cm.getY()+(cm.getHeight()/2)));
 
-                b.setProjectileX((cm.getX()+(cm.getWidth()/2))+7.5);
-                b.setProjectileY((cm.getY()+(cm.getHeight()/2)));
-                b.setProjectileRotation(rotation);
-                b.setActive();
-                
-                break;
-            } 
+                    b.setProjectileX((cm.getX()+(cm.getWidth()/2))+7.5);
+                    b.setProjectileY((cm.getY()+(cm.getHeight()/2)));
+                    b.setProjectileRotation(rotation);
+                    b.setActive();
+                    
+                    break;
+                } 
 
+            }
         }
         attackMovement();
         
@@ -191,9 +193,38 @@ public class Ranger extends CharacterType {
 
         @Override
         public void drawProjectile(Graphics2D g2d){
-            g2d.setColor(Color.GRAY);
+            g2d.setColor(Color.DARK_GRAY);
             Ellipse2D.Double bullet = new Ellipse2D.Double(xPos,yPos,this.width,this.height);
             g2d.fill(bullet);
+        }
+    }
+
+    /**
+        Checks whether the player is currently attacking with their weapon.
+        @param enemy is the enemy being checked if the player's weapon is colliding with them
+    **/
+    @Override
+    public void weaponCollidingWithEnemy(Enemy enemy) {
+          
+        double initialX = (cm.getX()+cm.getWidth()*11/20);
+        double width = 30;
+
+        double initialY = (cm.getY()+(cm.getHeight()/2));
+        double height = 40;
+
+        if (attacking){
+
+            boolean colliding = false;
+
+            colliding = !(initialX + width <= enemy.getX()
+            || initialX >= enemy.getX() + enemy.getWidth()
+            || initialY + height <= enemy.getY()
+            || initialY >= enemy.getY() + enemy.getHeight());
+
+            if (colliding){
+                enemy.getEnemyType().takeDamage(atk);
+            }
+
         }
     }
 

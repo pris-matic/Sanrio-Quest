@@ -53,6 +53,8 @@ public class Wizard extends CharacterType{
         getImages();
 
         img = idle;
+
+        alive = true;
     }
 
     @Override
@@ -115,23 +117,26 @@ public class Wizard extends CharacterType{
 
     @Override
     public void attack(){
-        attacking = true;
-        if (orbList.size() < 3){
-            orbList.add(new Orb((cm.getX()+(cm.getWidth()*0.7)+10), cm.getY()+30, rotation));
-        }
+        
+        if (alive){
+            attacking = true;
+            if (orbList.size() < 3){
+                orbList.add(new Orb((cm.getX()+(cm.getWidth()*0.7)+10), cm.getY()+30, rotation));
+            }
 
-        for (Projectiles o : orbList){
-            if (!o.isActive()){
+            for (Projectiles o : orbList){
+                if (!o.isActive()){
 
-                o.setInitialX((cm.getX()+(cm.getWidth()*0.65)+10));
-                o.setInitialY(cm.getY()+35);
+                    o.setInitialX((cm.getX()+(cm.getWidth()*0.65)+10));
+                    o.setInitialY(cm.getY()+35);
 
-                o.setProjectileX((cm.getX()+(cm.getWidth()*0.65)+10));
-                o.setProjectileY(cm.getY()+35);
-                o.setProjectileRotation(rotation);
-                o.setActive();
-                
-                break;
+                    o.setProjectileX((cm.getX()+(cm.getWidth()*0.65)+10));
+                    o.setProjectileY(cm.getY()+35);
+                    o.setProjectileRotation(rotation);
+                    o.setActive();
+                    
+                    break;
+                }
             }
         }
         attackMovement();
@@ -193,6 +198,35 @@ public class Wizard extends CharacterType{
             g2d.setColor(Color.RED);
             Ellipse2D.Double orb = new Ellipse2D.Double(xPos,yPos,this.width,this.height);
             g2d.fill(orb);
+        }
+    }
+
+    /**
+        Checks whether the player is currently attacking with their weapon.
+        @param enemy is the enemy being checked if the player's weapon is colliding with them
+    **/
+    @Override
+    public void weaponCollidingWithEnemy(Enemy enemy) {
+        
+        double initialX = (cm.getX()+(cm.getWidth()*0.65));
+        double width = 15;
+
+        double initialY = (cm.getY()+30);
+        double height = 50;
+
+        if (attacking){
+
+            boolean colliding = false;
+
+            colliding = !(initialX + width <= enemy.getX()
+            || initialX >= enemy.getX() + enemy.getWidth()
+            || initialY + height <= enemy.getY()
+            || initialY >= enemy.getY() + enemy.getHeight());
+
+            if (colliding){
+                enemy.getEnemyType().takeDamage(atk);
+            }
+
         }
     }
  

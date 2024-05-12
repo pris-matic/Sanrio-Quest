@@ -1,5 +1,6 @@
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -102,14 +103,19 @@ public abstract class CharacterType {
     /**
         A simple damage calculation whether certain conditions are met.
         It only divides the damage that the <code>EnemyType</code> will deal.
+        <p></p> before dealing damage, it checks whether the player had recently
+        received damage.
         @param damage is the damage the <code>CharacterType</code> object will take.
         @see EnemyType
         @see #getMaxHealth()
     **/
     public void takeDamage(double damage){
-        hp -= damage / def;
-        if (hp <= 0){
-            alive = false;
+        if (!cm.isInvincible()){
+            hp -= damage / def;
+            cm.setInvincibility();
+            if (hp <= 0){
+                alive = false;
+            }
         }
     }
 
@@ -128,6 +134,17 @@ public abstract class CharacterType {
         if (hp > maxHp){
             hp = maxHp;
         }
+    }
+
+    /**
+        Sets the health of the player to the specified amount
+        it is used for the HealthBar seen inside the canvas, as it is
+        needed to update the other player's health.
+        @param health is the amount of health the player has.
+        @see GameCanvas.HealthBar
+    **/
+    public void setHealth(double health){
+        hp = health;
     }
 
     /**
@@ -269,6 +286,12 @@ public abstract class CharacterType {
         @see CharacterType.Projectiles
     **/
     public abstract void drawAttacks(Graphics2D g2d);
+
+    public void drawEnemies(Graphics2D g2d, ArrayList<Enemy> enemies){
+        for (Enemy e : enemies) {
+            e.drawCharacter(g2d);
+        }
+    }
 
     /**
         Changes the rotation based on mouse movement.
@@ -521,5 +544,14 @@ public abstract class CharacterType {
             }
         }
     }
+
+    /**
+        Checks whether the player is currently attacking with their weapon
+        such as swinging the Melee Class' weapon.
+        @param enemy is the enemy being checked if the player's weapon is colliding with them
+        @see #isAttacking()
+        @see Melee
+    **/
+    public abstract void weaponCollidingWithEnemy(Enemy enemy);
 
 }

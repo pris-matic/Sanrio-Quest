@@ -53,6 +53,9 @@ public class Enemy extends CharacterManager {
         left = false;
         right = false;
 
+        invincible = false;
+        invincibleCooldown = 0;
+
         width = getEnemyType().getWidth();
         height = getEnemyType().getHeight();
         
@@ -87,7 +90,7 @@ public class Enemy extends CharacterManager {
         
         frameLock ++;
 
-        if (frameLock == 60){
+        if (frameLock == 120){
 
             double randomRotation = (Math.random() * 360);
             getEnemyType().setRotation(Math.toRadians(randomRotation));

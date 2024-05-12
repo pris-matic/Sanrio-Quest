@@ -40,6 +40,7 @@ public class GameCanvas extends JComponent implements Runnable {
     private Thread gameThread;
     private final int FPS; // times the screen will be repainted each second
     private Camera camera;
+    private LevelGenerator lg;
 
     /**
         Instantiates a GameCanvas object, with fixed dimensions of
@@ -70,6 +71,12 @@ public class GameCanvas extends JComponent implements Runnable {
         gameBackground.add(b);
         gameBackground.add(c);
         gameBackground.add(d);
+        
+        lg = new LevelGenerator();
+
+        for (Walls w : lg.getWalls()){
+            gameBackground.add(w);
+        }
 
         enemy = new Enemy("wingedcreature", 800, 600);
 
@@ -112,9 +119,18 @@ public class GameCanvas extends JComponent implements Runnable {
 
         g2d.translate(-(camera.getX()), -(camera.getY()));
 
+        // design for the starting area for the players
+        g2d.setColor(new Color(177, 224, 141));
+        g2d.fillRect(-500, -400, 2100, 1450);
+
+        g2d.setColor(new Color(255,212,146));
+        g2d.fillRect(0, 0, 1200, 800);
+
         for (Walls w : gameBackground){
             w.draw(g2d);
         }
+
+        lg.draw(g2d);
 
         // draws the character and its weapon
         p.drawCharacter(g2d);
@@ -176,9 +192,10 @@ public class GameCanvas extends JComponent implements Runnable {
         @see Enemy#isCollidingWithBullet(Player)
         @see #run()
     **/
-    public void checkCollisionWithProjectiles(){
+    public void checkDamageCollision(){
         p.isCollidingWithBullet(enemy);
         enemy.isCollidingWithBullet(p);
+        p.getCharacterType().weaponCollidingWithEnemy(enemy);
     }
 
     /**
@@ -236,21 +253,25 @@ public class GameCanvas extends JComponent implements Runnable {
 
     /**
         Moves the enemy according to its truth values
-        of up, down, left, right directions.
+        of up, down, left, right directions. When it collides with a wall while
+        moving in that direction, it bounces back, forcing it to move the opposite
+        direction immediately.
         <p></p> the enemy gets pushed back whenever it collides onto something.
     **/
-    public void checkEnemyMovement(){
+    public void checkEnemyMovement(Enemy enemy){
 
         enemy.moveAutomatically();
 
         if (enemy.isMovingUp()){
             enemy.moveY((-(enemy.getSpeed())));
-            if (enemy.isCollidingWithEntity(enemy, p)){
+            if (enemy.isCollidingWithEntity(enemy, p)){  
                 enemy.moveY((enemy.getSpeed()));
                 p.getCharacterType().takeDamage(enemy.getEnemyType().getAttack());
             }
             if (checkCollision(enemy)){
                 enemy.moveY((enemy.getSpeed()));
+                enemy.moveCharacter("up", false);
+                enemy.moveCharacter("down", true);
             }
             
         }
@@ -262,6 +283,8 @@ public class GameCanvas extends JComponent implements Runnable {
             }
             if (checkCollision(enemy)){
                 enemy.moveY((-(enemy.getSpeed())));
+                enemy.moveCharacter("up", true);
+                enemy.moveCharacter("down", false);
             }
         }
         if (enemy.isMovingLeft()){
@@ -272,6 +295,8 @@ public class GameCanvas extends JComponent implements Runnable {
             }
             if (checkCollision(enemy)){
                 enemy.moveX(enemy.getSpeed());
+                enemy.moveCharacter("left", false);
+                enemy.moveCharacter("right", true);
             }
         }
         if (enemy.isMovingRight()){
@@ -282,6 +307,8 @@ public class GameCanvas extends JComponent implements Runnable {
             }
             if (checkCollision(enemy)){
                 enemy.moveX(-(enemy.getSpeed()));
+                enemy.moveCharacter("left", true);
+                enemy.moveCharacter("right", false);
             }
         }
 
@@ -320,12 +347,9 @@ public class GameCanvas extends JComponent implements Runnable {
             lastTime = currentTime;
 
             if (delta >= 1){
-                checkMovement();
-                checkEnemyMovement();
-                updateCamera();
-                refreshHealth();
-                checkCollisionWithProjectiles();
+                updateGameState();
                 repaint();
+                System.out.println(enemy.getEnemyType().getHealth());
                 delta --;
             } 
         }
@@ -365,6 +389,22 @@ public class GameCanvas extends JComponent implements Runnable {
     public void refreshHealth(){
         p1HealthBar.updateHealth((int) p.getCharacterType().getHealth());
         p2HealthBar.updateHealth((int) p2.getCharacterType().getHealth());
+    }
+
+    /**
+        Updates everything that needs to be repainted inside the canvas
+        @see #run()
+    **/
+    private void updateGameState(){
+
+        // decided to put everything here rather than calling each one inside the run() method
+        checkMovement();
+        checkEnemyMovement(enemy);
+        updateCamera();
+        refreshHealth();
+        checkDamageCollision();
+        p.reduceTimer();
+        enemy.reduceTimer();
     }
 
     /**

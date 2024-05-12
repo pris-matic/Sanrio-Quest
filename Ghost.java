@@ -9,10 +9,10 @@ public class Ghost extends EnemyType {
 
         this.cm = cm;
         
-        maxHp = 150;
-        hp = 150;
+        maxHp = 100;
+        hp = 100;
         atk = 4;
-        def = 8;
+        def = 2;
 
         alive = false;
         width = 50;

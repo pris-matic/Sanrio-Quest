@@ -53,7 +53,7 @@ public class Player extends CharacterManager{
         height = 90;
         speed = 4;
 
-        
+     
     }
 
     @Override

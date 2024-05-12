@@ -93,12 +93,12 @@ public class GameFrame {
         } else {
             
             // TODO revert if multi
-            p2 = new Player(p2Name,p2PlayerType,200,200);
-            p = new Player(name,playerType,400,200);
+            // p2 = new Player(p2Name,p2PlayerType,200,200);
+            // p = new Player(name,playerType,400,200);
 
             // TODO single player debugging!
-            // p2 = new Player("test","wizard",200,200);
-            // p = new Player("player","wizard",400,200);
+            p2 = new Player("test","wizard",200,200);
+            p = new Player("player","ranger",400,200);
         }
     }
     
@@ -321,6 +321,7 @@ public class GameFrame {
                         projectileY.add(dataIn.readDouble());
                     }
                     int playerImage = dataIn.readInt();
+                    double player2Health = dataIn.readDouble();
                     
                     if(p2 != null){
                         p2.setName(playerName);
@@ -328,6 +329,7 @@ public class GameFrame {
                         p2.setY(playerY);
                         p2.getCharacterType().setRotation(weaponRotation);
                         p2.getCharacterType().setImage(playerImage);
+                        p2.getCharacterType().setHealth(player2Health);
                         
                         if (p2.getCharacterType().getProjectiles() != null){
                             // a getter method to determine what type of projectile is being sent by the other player
@@ -426,6 +428,7 @@ public class GameFrame {
                         }
 
                         dataOut.writeInt(p.getCharacterType().getSpriteNumber());
+                        dataOut.writeDouble(p.getCharacterType().getHealth());
                     
                         dataOut.flush();
 
