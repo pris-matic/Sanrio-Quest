@@ -8,7 +8,10 @@ import javax.imageio.ImageIO;
 import javax.swing.Timer;
 
 /**
-The Winged Creature Class 
+The Winged Creature Class is a subclass of the <code> EnemyType </code>
+abstract class. It is the type of enemy the player battles against
+inside the game.
+
 
 @author Anthony B. Deocadiz Jr. (232166)
 @author Ramona Miekaela S. Laciste (233403)
