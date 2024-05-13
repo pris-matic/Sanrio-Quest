@@ -3,8 +3,16 @@ import java.io.IOException;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.imageio.ImageIO;
 
+/**
+* Represents a ghost enemy in the game.
+* Extends the EnemyType class.
+*/
 public class Ghost extends EnemyType {
 
+    /**
+     * Constructor for the Ghost class.
+     * @param cm The CharacterManager object associated with the game.
+     */
     public Ghost(CharacterManager cm){
 
         this.cm = cm;
@@ -23,11 +31,19 @@ public class Ghost extends EnemyType {
         img = front1;
 
     }
+
+    /**
+     * Returns the type of the enemy.
+     * @return A string representing the enemy type ("Ghost").
+     */
     @Override
     public String showEnemyType() {
         return "Ghost";
     }
 
+    /**
+     * Loads images for the ghost enemy from the resource directory.
+     */
     @Override
     public void getImages() {
         
@@ -43,21 +59,35 @@ public class Ghost extends EnemyType {
         }
     }
 
+    /**
+     * Draws the attack animations of the ghost enemy.
+     * @param g2d The Graphics2D object used for drawing.
+     */
     @Override
     public void drawAttacks(Graphics2D g2d) {
 
     }
 
+    /**
+     * Initiates an attack action for the ghost enemy.
+     */
     @Override
     public void attack() {
         
     }
 
+    /**
+     * Handles the movement during an attack action for the ghost enemy.
+     */
     @Override
     public void attackMovement() {
         
     }
 
+    /**
+     * Gets the projectiles associated with the ghost enemy.
+     * @return A list of EnemyProjectiles associated with the ghost enemy (null for Ghost).
+     */
     @Override
     public CopyOnWriteArrayList<EnemyProjectiles> getProjectiles() {
         return null;
