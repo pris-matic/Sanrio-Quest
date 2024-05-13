@@ -32,8 +32,12 @@ of our program.
 
 public class Melee extends CharacterType {
 
-    private Timer swordTimer;
+    private Timer swordTimer
 
+    /**
+     * Constructor for the Melee class.
+     * @param cm The CharacterManager object.
+     */
     public Melee(CharacterManager cm){
         
         maxHp = 200;
@@ -52,11 +56,18 @@ public class Melee extends CharacterType {
 
     }
 
+     /**
+     * Returns the character type.
+     * @return A string representing the character type.
+     */
     @Override
     public String showCharacterType() {
         return "Melee";
     }
 
+    /**
+     * Loads images for the Melee character.
+     */
     @Override
     public void getImages(){
 
@@ -88,6 +99,10 @@ public class Melee extends CharacterType {
         }
     }
 
+    /**
+     * Draws the character's weapon.
+     * @param g2d The graphics context.
+     */
     @Override
     public void drawWeapon(Graphics2D g2d) {
   
@@ -101,6 +116,11 @@ public class Melee extends CharacterType {
         // unused due to having no projectiles for the given class
     }
 
+    /**
+     * Changes the rotation of the character.
+     * @param yPos The y-coordinate of the target position.
+     * @param xPos The x-coordinate of the target position.
+     */
     @Override
     public void changeRotation(double yPos, double xPos){
         
@@ -110,6 +130,9 @@ public class Melee extends CharacterType {
 
     }
 
+     /**
+     * Initiates an attack action.
+     */
     @Override
     public void attack(){
         
@@ -119,12 +142,19 @@ public class Melee extends CharacterType {
         }
         
     }
-    
+
+     /**
+     * Retrieves the list of projectiles.
+     * @return Always returns null as there are no projectiles for Melee class.
+     */
     @Override
     public CopyOnWriteArrayList<Projectiles> getProjectiles(){
         return null;
     }
 
+    /**
+     * Initiates the movement of the character's attack.
+     */
     @Override
     public void attackMovement(){
 
