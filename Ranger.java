@@ -35,6 +35,10 @@ public class Ranger extends CharacterType {
     private CopyOnWriteArrayList<Projectiles> bulletList;
     private Timer bulletMovement;
 
+     /**
+     * Constructor for the Ranger class.
+     * @param cm The CharacterManager object.
+     */
     public Ranger(CharacterManager cm){
         
         maxHp = 75;
@@ -55,12 +59,19 @@ public class Ranger extends CharacterType {
         img = idle;
 
     }
-
+    
+    /**
+     * Returns the character type.
+     * @return A string representing the character type ("Ranger").
+     */
     @Override
     public String showCharacterType(){
         return "Ranger";
     }
 
+    /**
+     * Loads images for the Ranger character.
+     */
     @Override
     public void getImages(){
 
@@ -92,6 +103,10 @@ public class Ranger extends CharacterType {
         }
     }
 
+    /**
+     * Draws the character's weapon.
+     * @param g2d The graphics context.
+     */
     @Override
     public void drawWeapon(Graphics2D g2d) {
 
@@ -99,6 +114,10 @@ public class Ranger extends CharacterType {
 
     }
 
+    /**
+     * Draws the character's attacks.
+     * @param g2d The graphics context.
+     */
     @Override
     public void drawAttacks(Graphics2D g2d){
         for (Projectiles b : bulletList){
@@ -106,6 +125,11 @@ public class Ranger extends CharacterType {
         }
     }
 
+    /**
+     * Changes the rotation of the character.
+     * @param yPos The y-coordinate of the target position.
+     * @param xPos The x-coordinate of the target position.
+     */
     @Override
     public void changeRotation(double yPos, double xPos){
 
@@ -115,6 +139,9 @@ public class Ranger extends CharacterType {
 
     }
 
+     /**
+     * Initiates an attack action.
+     */
     @Override
     public void attack(){
 
@@ -142,6 +169,9 @@ public class Ranger extends CharacterType {
         
     }
 
+    /**
+     * Initiates the movement of the character's attack.
+     */
     @Override
     public void attackMovement(){
         if (bulletMovement == null || !bulletMovement.isRunning()){
@@ -168,6 +198,10 @@ public class Ranger extends CharacterType {
     
     }
 
+    /**
+     * Retrieves the list of projectiles.
+     * @return A CopyOnWriteArrayList containing projectiles.
+     */
     @Override
     public CopyOnWriteArrayList<Projectiles> getProjectiles(){
         return bulletList;
@@ -191,6 +225,10 @@ public class Ranger extends CharacterType {
             active = false;
         }
 
+        /**
+         * Draws the bullet.
+         * @param g2d The graphics context.
+         */
         @Override
         public void drawProjectile(Graphics2D g2d){
             g2d.setColor(Color.DARK_GRAY);
