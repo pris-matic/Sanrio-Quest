@@ -32,7 +32,7 @@ of our program.
 
 public class Melee extends CharacterType {
 
-    private Timer swordTimer
+    private Timer swordTimer;
 
     /**
      * Constructor for the Melee class.
