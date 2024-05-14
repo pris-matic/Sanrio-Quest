@@ -93,10 +93,8 @@ public class GameFrame {
             p = new Player(name,playerType,400,1900);
             p2 = new Player(p2Name,p2PlayerType,400,2000);
         } else {
-            // p2 = new Player(p2Name,p2PlayerType,400,2000);
-            // p = new Player(name,playerType,400,2000);
-            p2 = new Player("p2Name","melee",400,2000);
-            p = new Player("a","wizard",-9630,-9745);
+            p2 = new Player(p2Name,p2PlayerType,400,1900);
+            p = new Player(name,playerType,400,2000);
         }
     }
     
