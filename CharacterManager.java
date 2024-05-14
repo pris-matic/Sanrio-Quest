@@ -1,4 +1,5 @@
 import java.awt.Graphics2D;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
 The CharacterManager abstract class is used to define the 
@@ -33,6 +34,7 @@ public abstract class CharacterManager {
     protected CharacterType ct; // used by the player
     protected EnemyType et; // used by the enemies
     protected String name;
+    protected CopyOnWriteArrayList<Enemy> enemyList;
 
     // for invincibility frames | IFrames
     protected boolean invincible;
@@ -139,9 +141,9 @@ public abstract class CharacterManager {
     }
 
     /**
-        Checks whether the player is currently invincible in
+        Checks whether the character is currently invincible in
         taking any form of damage.
-        @return true if the player's invincible, false otherwise.
+        @return true if the <code> CharacterManager</code> invincible, false otherwise.
         @see CharacterType#takeDamage(double)
     **/
     public boolean isInvincible(){
@@ -164,8 +166,8 @@ public abstract class CharacterManager {
 
     /** 
         Updates the cooldown of the invincibility frames of the player.
-        it it tied to the number of times the GameCanvas gets repainted.
-        @see GameCanvas#run()
+        it it tied to the number of times the GameServer tries to send out information.
+        @see GameServer.WriteToClient
     **/
     public void reduceTimer(){
         if (invincibleCooldown > 0){
@@ -243,17 +245,24 @@ public abstract class CharacterManager {
         Determines whether two instances of the <code>CharacterManager</code> are colliding
         with each other.
         @param player is the player instance under <code>CharacterManager</code>.
-        @param enemy is the enemy instance under <code>CharacterManager</code>.
+        @param enemies is the arraylist of enemies under <code>CharacterManager</code>.
         @return true if they are colliding with each other, false otherwise.
     */
-    public boolean isCollidingWithEntity(CharacterManager player, CharacterManager enemy){
+    public boolean isCollidingWithEntity(CharacterManager player, CopyOnWriteArrayList<Enemy> enemies){
        
         boolean collision = false;
 
-        collision = !(player.getX() + player.getWidth() <= enemy.getX()||
-        player.getX()>= enemy.getX() + enemy.getWidth() ||
-        player.getY() + player.getHeight() <= enemy.getY()||
-        player.getY()>= enemy.getY() + enemy.getHeight());
+        for (Enemy enemy : enemies){
+            collision = !(player.getX() + player.getWidth() <= enemy.getX()||
+            player.getX()>= enemy.getX() + enemy.getWidth() ||
+            player.getY() + player.getHeight() <= enemy.getY()||
+            player.getY()>= enemy.getY() + enemy.getHeight());
+
+            if (collision){
+                player.getCharacterType().takeDamage(enemy.getEnemyType().getAttack());
+                break;
+            }
+        }
 
         return collision;
 
@@ -265,6 +274,8 @@ public abstract class CharacterManager {
         @param move tells whether the object will move in that direction.
         @see GameFrame.KeysPressed
         @see GameFrame.KeysReleased
+        @see EnemyGenerator#moveAllEnemies()
+        @see Enemy#moveAutomatically()
     **/
     public void moveCharacter(String direction, boolean move){
     

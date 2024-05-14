@@ -14,7 +14,7 @@ public class Ghost extends EnemyType {
         atk = 4;
         def = 2;
 
-        alive = false;
+        alive = true;
         width = 50;
         height = 50;
 
@@ -63,5 +63,4 @@ public class Ghost extends EnemyType {
         return null;
     }
     
-
 }

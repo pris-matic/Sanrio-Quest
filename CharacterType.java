@@ -1,6 +1,5 @@
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -53,7 +52,7 @@ public abstract class CharacterType {
  
     /**
         Gets the maximum health the <Code>CharacterType</code> object can have
-        @return the max health of the object.
+        @return the max health of that character.
     **/
     public double getMaxHealth(){
         return maxHp;
@@ -116,23 +115,6 @@ public abstract class CharacterType {
             if (hp <= 0){
                 alive = false;
             }
-        }
-    }
-
-    /**
-        Heals the player. The amount of healing cannot exceed the 
-        maximum health of the <code>CharacterType</code> object.
-        @param health is the amount of health that will be healed to the player.
-    **/
-    public void healCharacter(double health){
-        hp += health;
-        
-        if (hp >= 0){
-            alive = true;
-        }
-
-        if (hp > maxHp){
-            hp = maxHp;
         }
     }
 
@@ -286,12 +268,6 @@ public abstract class CharacterType {
         @see CharacterType.Projectiles
     **/
     public abstract void drawAttacks(Graphics2D g2d);
-
-    public void drawEnemies(Graphics2D g2d, ArrayList<Enemy> enemies){
-        for (Enemy e : enemies) {
-            e.drawCharacter(g2d);
-        }
-    }
 
     /**
         Changes the rotation based on mouse movement.
@@ -484,10 +460,10 @@ public abstract class CharacterType {
         **/
         public boolean isCollidingWith(CharacterManager chr){
             
-            return !(chr.getX() + chr.getWidth() <= xPos ||
-            chr.getX() >= xPos + this.width ||
-            chr.getY() + chr.getHeight() <= yPos ||
-            chr.getY() >= yPos + this.height);
+            return !(chr.getX() + chr.getWidth() <= xPos + 5 ||
+            chr.getX() >= xPos + this.width - 5 ||
+            chr.getY() + chr.getHeight() <= yPos + 5 ||
+            chr.getY() >= yPos + this.height - 5);
             
         }
 
@@ -523,7 +499,7 @@ public abstract class CharacterType {
         for (int i = 0; i < projectiles.size() ; i ++){
             if (projectiles.get(i).isActive()){
 
-                for (Walls w : GameCanvas.getWalls()){
+                for (Walls w : LevelGenerator.getWalls()){
                     if (projectiles.get(i).isCollidingWithWall(w)){
                         projectiles.get(i).setActive();
                         projectiles.get(i).setProjectileX(-5000);
@@ -535,7 +511,7 @@ public abstract class CharacterType {
                 double y = Math.abs(projectiles.get(i).getY() - projectiles.get(i).getInitialY());
                 double pythagorean = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
 
-                if (pythagorean >= 500 && projectiles.get(i).isActive()){
+                if (pythagorean >= 700 && projectiles.get(i).isActive()){
                     projectiles.get(i).setActive();
                     projectiles.get(i).setProjectileX(-5000);
                     projectiles.get(i).setProjectileY(-5000);

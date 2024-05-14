@@ -45,6 +45,7 @@ public class GameFrame {
     private int playerID;
     private ReadFromServer rfs;
     private WriteToServer wts;
+    private EnemyGenerator enemygen;
     
     /**
         Instantiates the GameFrame for the player and
@@ -70,6 +71,7 @@ public class GameFrame {
         frame.setTitle("Sanrio Quest | " + p.getName());
 
         gc = new GameCanvas(p,p2);
+        enemygen = gc.getEnemies();
         gc.startThread();
         frame.add(gc);
         frame.pack();
@@ -93,12 +95,12 @@ public class GameFrame {
         } else {
             
             // TODO revert if multi
-            // p2 = new Player(p2Name,p2PlayerType,200,200);
-            // p = new Player(name,playerType,400,200);
+            p2 = new Player(p2Name,p2PlayerType,200,200);
+            p = new Player(name,playerType,400,200);
 
             // TODO single player debugging!
-            p2 = new Player("test","wizard",200,200);
-            p = new Player("player","ranger",400,200);
+            // p2 = new Player("test","wizard",200,200);
+            // p = new Player("player","ranger",400,200);
         }
     }
     
@@ -315,15 +317,38 @@ public class GameFrame {
 
                     ArrayList<Double> projectileX = new ArrayList<>();
                     ArrayList<Double> projectileY = new ArrayList<>();
+                    
+                    ArrayList<Double> enemyX = new ArrayList<>();
+                    ArrayList<Double> enemyY = new ArrayList<>();
+
+                    ArrayList<Double> enemyProjectileX = new ArrayList<>();
+                    ArrayList<Double> enemyProjectileY = new ArrayList<>();
+
 
                     for (int i = 0; i < projectileCount ; i++){
                         projectileX.add(dataIn.readDouble());
                         projectileY.add(dataIn.readDouble());
                     }
+
+                    for (int i = 0; i < 4 ; i ++){
+                        enemyX.add(dataIn.readDouble());
+                        enemyY.add(dataIn.readDouble());
+                    }
+
+                    for (int i = 0; i < 4 ; i ++){
+                        int numProjectiles = dataIn.readInt();
+                        if (numProjectiles == 2){
+                            for (int j = 0; j < numProjectiles ; j++){
+                                enemyProjectileX.add(dataIn.readDouble());
+                                enemyProjectileY.add(dataIn.readDouble());
+                            }
+                        }
+                    }
+
                     int playerImage = dataIn.readInt();
                     double player2Health = dataIn.readDouble();
                     
-                    if(p2 != null){
+                    if(p2 != null && enemygen != null){
                         p2.setName(playerName);
                         p2.setX(playerX);
                         p2.setY(playerY);
@@ -347,8 +372,31 @@ public class GameFrame {
                             }
 
                         }
+                        for (int i = 0; i < 4; i++){
+                            gc.getEnemies().get(i).setX(enemyX.get(i));
+                            gc.getEnemies().get(i).setY(enemyY.get(i));
+                        }
+
+                        // only for the ones with projectiles
+                        // which is at index 2 and 3 always
+                        for (int i = 2; i < 4; i++){
+
+                            
+
+                            for (int j = 0 ; j < 2; j++){
+                                if (i == 2){
+                                    gc.getEnemies().get(i).getEnemyType().getProjectiles().get(j).setProjectileX(enemyProjectileX.get(j));
+                                    gc.getEnemies().get(i).getEnemyType().getProjectiles().get(j).setProjectileY(enemyProjectileY.get(j));
+                                } else {
+                                    gc.getEnemies().get(i).getEnemyType().getProjectiles().get(j).setProjectileX(enemyProjectileX.get(j+2));
+                                    gc.getEnemies().get(i).getEnemyType().getProjectiles().get(j).setProjectileY(enemyProjectileY.get(j+2));
+                                }
+                            }
+
+
+                        }
                         
-                    }   
+                    }
                 }
             } catch (IOException ex) {
                 System.out.println("IOEXception from RFS.run()");

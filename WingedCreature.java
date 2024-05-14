@@ -28,7 +28,7 @@ public class WingedCreature extends EnemyType{
         height = 55;
         
         starsList = new CopyOnWriteArrayList<>();
-        for (int i = 0; i < 3; i ++){
+        for (int i = 0; i < 2; i ++){
             starsList.add(new Stars(-5000, -5000, 0));
         }
 
@@ -64,7 +64,6 @@ public class WingedCreature extends EnemyType{
         for (EnemyProjectiles ep : starsList){
             ep.drawProjectile(g2d);
         }
-        attack();
     }
 
     @Override

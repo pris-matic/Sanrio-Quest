@@ -1,7 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.*;
-import java.util.ArrayList;
 
 /**
 The GameCanvas class is responsible for drawing the
@@ -32,15 +31,14 @@ public class GameCanvas extends JComponent implements Runnable {
     
     private Player p;
     private Player p2;
-    private Enemy enemy;
     //private ArrayList<Enemy> enemies;
     private HealthBar p1HealthBorder,p1HealthBar,p2HealthBorder,p2HealthBar;
 
-    private static ArrayList<Walls> gameBackground;
     private Thread gameThread;
     private final int FPS; // times the screen will be repainted each second
     private Camera camera;
-    private LevelGenerator lg;
+    private static LevelGenerator lg;
+    private EnemyGenerator enemyGenerator;
 
     /**
         Instantiates a GameCanvas object, with fixed dimensions of
@@ -58,27 +56,11 @@ public class GameCanvas extends JComponent implements Runnable {
         this.setPreferredSize(new Dimension(800,600));
         FPS = 60;
 
-        gameBackground = new ArrayList<>();
         camera = new Camera((p.getX()+(p.getWidth()/2)),(p.getY()+(p.getHeight()/2)),p);
         setDoubleBuffered(true);
 
-        Walls a = new Walls(0, 0, 1200, 50);
-        Walls b = new Walls(0, 0, 50, 800);
-        Walls c = new Walls(1150, 0, 50, 800);
-        Walls d = new Walls(0, 750,1200, 50);
-
-        gameBackground.add(a);
-        gameBackground.add(b);
-        gameBackground.add(c);
-        gameBackground.add(d);
-        
         lg = new LevelGenerator();
-
-        for (Walls w : lg.getWalls()){
-            gameBackground.add(w);
-        }
-
-        enemy = new Enemy("wingedcreature", 800, 600);
+        enemyGenerator = new EnemyGenerator();
 
         p1HealthBorder = new HealthBar(10, 10, 200, 35,
             p.getCharacterType().getMaxHealth(), Color.BLACK, false,p);
@@ -91,6 +73,7 @@ public class GameCanvas extends JComponent implements Runnable {
 
         p2HealthBar = new HealthBar(590, 10, 200, 35, 
             p2.getCharacterType().getMaxHealth(),Color.GREEN.darker(),true,p2);
+
     }
 
     /**
@@ -126,7 +109,7 @@ public class GameCanvas extends JComponent implements Runnable {
         g2d.setColor(new Color(255,212,146));
         g2d.fillRect(0, 0, 1200, 800);
 
-        for (Walls w : gameBackground){
+        for (Walls w : LevelGenerator.getWalls()){
             w.draw(g2d);
         }
 
@@ -150,9 +133,11 @@ public class GameCanvas extends JComponent implements Runnable {
         g2d.setTransform(saveState);
         p2.getCharacterType().drawAttacks(g2d);
 
-        enemy.drawCharacter(g2d);
-        saveState = g2d.getTransform();
-        enemy.getEnemyType().drawAttacks(g2d);
+        for (Enemy enemy : enemyGenerator){
+            enemy.drawCharacter(g2d);
+            saveState = g2d.getTransform();
+            enemy.getEnemyType().drawAttacks(g2d);
+        }
         
         g2d.setTransform(reset);
 
@@ -176,7 +161,7 @@ public class GameCanvas extends JComponent implements Runnable {
         
         boolean collision = false;
         
-        for (Walls w : gameBackground){
+        for (Walls w : LevelGenerator.getWalls()){
             if (cm.isCollidingWithWall(w)){
                 collision = true;
                 break;
@@ -193,9 +178,12 @@ public class GameCanvas extends JComponent implements Runnable {
         @see #run()
     **/
     public void checkDamageCollision(){
-        p.isCollidingWithBullet(enemy);
-        enemy.isCollidingWithBullet(p);
-        p.getCharacterType().weaponCollidingWithEnemy(enemy);
+        for (Enemy enemy : enemyGenerator){
+            p.isCollidingWithBullet(enemy);
+            p.getCharacterType().weaponCollidingWithEnemy(enemy);
+            p.bulletCollidedWithEnemy(enemy);
+        }
+
     }
 
     /**
@@ -207,9 +195,8 @@ public class GameCanvas extends JComponent implements Runnable {
 
         if (p.isMovingUp()){
             p.moveY(-(p.getSpeed()));
-            if (p.isCollidingWithEntity(p, enemy)){
+            if (p.isCollidingWithEntity(p, enemyGenerator)){
                 p.moveY(p.getSpeed());
-                p.getCharacterType().takeDamage(enemy.getEnemyType().getAttack());
             }
             if ((checkCollision(p))){
                 p.moveY(p.getSpeed());
@@ -218,9 +205,8 @@ public class GameCanvas extends JComponent implements Runnable {
         }
         if (p.isMovingDown()){
             p.moveY(p.getSpeed());
-            if (p.isCollidingWithEntity(p, enemy)){
+            if (p.isCollidingWithEntity(p, enemyGenerator)){
                 p.moveY(-(p.getSpeed()));
-                p.getCharacterType().takeDamage(enemy.getEnemyType().getAttack());
             }
             if ((checkCollision(p))){
                 p.moveY(-(p.getSpeed()));
@@ -228,9 +214,9 @@ public class GameCanvas extends JComponent implements Runnable {
         }
         if (p.isMovingLeft()){
             p.moveX(-(p.getSpeed()));
-            if (p.isCollidingWithEntity(p, enemy)){
+            if (p.isCollidingWithEntity(p, enemyGenerator)){
                 p.moveX(p.getSpeed());
-                p.getCharacterType().takeDamage(enemy.getEnemyType().getAttack());
+
             }
             if ((checkCollision(p))){
                 p.moveX(p.getSpeed());
@@ -238,9 +224,8 @@ public class GameCanvas extends JComponent implements Runnable {
         }
         if (p.isMovingRight()){
             p.moveX(p.getSpeed());
-            if (p.isCollidingWithEntity(p, enemy)){
+            if (p.isCollidingWithEntity(p, enemyGenerator)){
                 p.moveX(-(p.getSpeed()));
-                p.getCharacterType().takeDamage(enemy.getEnemyType().getAttack());
             }
             if ((checkCollision(p))){
                 p.moveX(-(p.getSpeed()));
@@ -248,71 +233,7 @@ public class GameCanvas extends JComponent implements Runnable {
         }
 
         p.getCharacterType().displayImage();
-        
-    }
-
-    /**
-        Moves the enemy according to its truth values
-        of up, down, left, right directions. When it collides with a wall while
-        moving in that direction, it bounces back, forcing it to move the opposite
-        direction immediately.
-        <p></p> the enemy gets pushed back whenever it collides onto something.
-    **/
-    public void checkEnemyMovement(Enemy enemy){
-
-        enemy.moveAutomatically();
-
-        if (enemy.isMovingUp()){
-            enemy.moveY((-(enemy.getSpeed())));
-            if (enemy.isCollidingWithEntity(enemy, p)){  
-                enemy.moveY((enemy.getSpeed()));
-                p.getCharacterType().takeDamage(enemy.getEnemyType().getAttack());
-            }
-            if (checkCollision(enemy)){
-                enemy.moveY((enemy.getSpeed()));
-                enemy.moveCharacter("up", false);
-                enemy.moveCharacter("down", true);
-            }
-            
-        }
-        if (enemy.isMovingDown()){
-            enemy.moveY((enemy.getSpeed()));
-            if (enemy.isCollidingWithEntity(enemy, p)){
-                enemy.moveY((-(enemy.getSpeed())));
-                p.getCharacterType().takeDamage(enemy.getEnemyType().getAttack());
-            }
-            if (checkCollision(enemy)){
-                enemy.moveY((-(enemy.getSpeed())));
-                enemy.moveCharacter("up", true);
-                enemy.moveCharacter("down", false);
-            }
-        }
-        if (enemy.isMovingLeft()){
-            enemy.moveX(-(enemy.getSpeed()));
-            if (enemy.isCollidingWithEntity(enemy, p)){
-                enemy.moveX(enemy.getSpeed());
-                p.getCharacterType().takeDamage(enemy.getEnemyType().getAttack());
-            }
-            if (checkCollision(enemy)){
-                enemy.moveX(enemy.getSpeed());
-                enemy.moveCharacter("left", false);
-                enemy.moveCharacter("right", true);
-            }
-        }
-        if (enemy.isMovingRight()){
-            enemy.moveX(enemy.getSpeed());
-            if (enemy.isCollidingWithEntity(enemy, p)){
-                enemy.moveX(-(enemy.getSpeed()));
-                p.getCharacterType().takeDamage(enemy.getEnemyType().getAttack());
-            }
-            if (checkCollision(enemy)){
-                enemy.moveX(-(enemy.getSpeed()));
-                enemy.moveCharacter("left", true);
-                enemy.moveCharacter("right", false);
-            }
-        }
-
-        enemy.getEnemyType().displayImage();
+     
     }
 
     /**
@@ -349,7 +270,6 @@ public class GameCanvas extends JComponent implements Runnable {
             if (delta >= 1){
                 updateGameState();
                 repaint();
-                System.out.println(enemy.getEnemyType().getHealth());
                 delta --;
             } 
         }
@@ -373,15 +293,6 @@ public class GameCanvas extends JComponent implements Runnable {
         return camera;
     }
 
-    /**
-        Gets the walls that are used throughout the game.
-        Only one copy of walls are required. 
-        @return the arraylist that stores the <code> Walls </code> objects.
-    **/
-    public static ArrayList<Walls> getWalls(){
-        return gameBackground;
-    }
-
     /**  
         Repaints the <code> HealthBar</code> objects based on the health of each of the players.
         @see GameCanvas.HealthBar
@@ -399,12 +310,10 @@ public class GameCanvas extends JComponent implements Runnable {
 
         // decided to put everything here rather than calling each one inside the run() method
         checkMovement();
-        checkEnemyMovement(enemy);
         updateCamera();
         refreshHealth();
         checkDamageCollision();
         p.reduceTimer();
-        enemy.reduceTimer();
     }
 
     /**
@@ -416,7 +325,7 @@ public class GameCanvas extends JComponent implements Runnable {
 
         @author Anthony B. Deocadiz Jr. (232166)
         @author Ramona Miekaela S. Laciste (233403)
-        @version March 16, 2024
+        @version May 09, 2024
     **/
     class HealthBar {
         private int x, y, width, height;
@@ -491,6 +400,14 @@ public class GameCanvas extends JComponent implements Runnable {
             currentHealth = value;
         }
         
+    }
+    
+    /**
+        Gets the enemies to be updated inside the GameFrame
+        @return the arraylist of enemies.
+    **/
+    public EnemyGenerator getEnemies(){
+        return enemyGenerator;
     }
 
 }

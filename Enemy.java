@@ -1,8 +1,9 @@
 import java.awt.*;
+import java.util.ArrayList;
 
 /**
     The Enemy Class is responsible for moving the enemies throughout
-    the game.
+    the game. It is the opponent of the <Code>Player</code> class.
 
     <p></p>
     Automated movement, and automated firing is done by this class.
@@ -123,28 +124,54 @@ public class Enemy extends CharacterManager {
                     break;
             }
             frameLock = 0;
+
+            getEnemyType().displayImage();
         }
 
     }
 
     /**
-        Determines whether the enemy was hit by a projectile.
-        @param player is the player to be called, along with its projectiles, if there is any.
+        Determines whether the enemy was hit by a projectile. Since this class
+        is inside the server, the x and y variables of the player's projectiles are checked.
+        @param projectilesX is the x value of the projectile
+        @param projectilesY is the y value of the projectile
     **/
-    public void isCollidingWithBullet(Player player){
+    public boolean isCollidingWithBullet(ArrayList<Double> projectilesX, ArrayList<Double> projectilesY){
     
-        if (player.getCharacterType().getProjectiles() != null){
-            for (CharacterType.Projectiles p : player.getCharacterType().getProjectiles()){
-                if (p.isCollidingWith(this)){
-    
-                    p.setActive();
-                    p.setProjectileX(-5000);
-                    p.setProjectileY(-5000);
-                    this.getEnemyType().takeDamage(player.getCharacterType().getAttack());
-                    break;
-                }
-            }
+        boolean colliding = false;
+
+        for (int i = 0; i < projectilesX.size(); i ++){
+            
+            colliding = !(projectilesX.get(i) + 20 <= this.x ||
+            projectilesX.get(i) >= this.x + this.width ||
+            projectilesY.get(i) + 20 <= this.y ||
+            projectilesY.get(i) >= this.y + this.height);
+
+            if (colliding){
+                break;
+            }   
         }
+        return colliding;
+
+    }
+
+    /**
+        Determines whether the enemy is colliding with a player. Since this class
+        is inside the server, the x and y variables of the player is checked.
+        @param playerX is the player's x position.
+        @param playerY is the player's y position.
+    **/
+    public boolean enemyCollidingWithPlayer(double playerX, double playerY){
+       
+        boolean collision = false;
+
+            collision = !(playerX + 60 <= this.x||
+            playerX>= this.x + this.width ||
+            playerY + 90 <= this.y||
+            playerY>= this.y + this.height);
+
+        return collision;
+
     }
 
 }

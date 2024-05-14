@@ -34,7 +34,7 @@ of our program.
 public class LevelGenerator implements BackgroundManager {
 
     private BufferedImage level1,level2,level3,level4,level5;
-    private ArrayList<Walls> levelWalls;
+    private static ArrayList<Walls> levelWalls;
 
     /** 
         Instantiates a LevelGenerator Object that will also get the images
@@ -57,6 +57,18 @@ public class LevelGenerator implements BackgroundManager {
         }
 
         // collision / walls for objects per level
+
+        // starting walls 
+
+        Walls a = new Walls(0, 0, 1200, 50);
+        Walls b = new Walls(0, 0, 50, 800);
+        Walls c = new Walls(1150, 0, 50, 800);
+        Walls d = new Walls(0, 750,1200, 50);
+
+        levelWalls.add(a);
+        levelWalls.add(b);
+        levelWalls.add(c);
+        levelWalls.add(d);
 
         // Walls for Level 1 -- My_Melody | My Melody's Music Store
 
@@ -553,7 +565,7 @@ public class LevelGenerator implements BackgroundManager {
 
     }
 
-    public ArrayList<Walls> getWalls(){
+    public static ArrayList<Walls> getWalls(){
         return levelWalls;
     }
  

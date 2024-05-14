@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
 The Player class is the one that will be interacted
@@ -53,7 +54,8 @@ public class Player extends CharacterManager{
         height = 90;
         speed = 4;
 
-     
+        enemyList = new CopyOnWriteArrayList<>();
+ 
     }
 
     @Override
@@ -65,15 +67,28 @@ public class Player extends CharacterManager{
 
     }
 
+    // TODO javadoc -- when player gets hit
     public void isCollidingWithBullet(Enemy enemy){
 
         if (enemy.getEnemyType().getProjectiles() != null){
             for (EnemyType.EnemyProjectiles p : enemy.getEnemyType().getProjectiles()){
                 if (p.isCollidingWith(this)){;
+                    this.getCharacterType().takeDamage(enemy.getEnemyType().getAttack());
+                    break;
+                }
+            }
+        }
+    }
+
+    // TODO javadoc -- when enemy gets hit
+    public void bulletCollidedWithEnemy(Enemy enemy){
+
+        if (getCharacterType().getProjectiles() != null){
+            for (CharacterType.Projectiles p: getCharacterType().getProjectiles()){
+                if (p.isCollidingWith(enemy)){;
                     p.setActive();
                     p.setProjectileX(-5000);
                     p.setProjectileY(-5000);
-                    this.getCharacterType().takeDamage(enemy.getEnemyType().getAttack());
                     break;
                 }
             }

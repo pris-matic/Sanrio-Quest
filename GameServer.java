@@ -48,6 +48,10 @@ public class GameServer {
     // contents of the arraylist sent as primitive types
     private int p1ProjectileCount,p2ProjectileCount;
     private ArrayList<Double> p1ProjectileX, p1ProjectileY, p2ProjectileX, p2ProjectileY;
+ 
+    // Generates Enemies and other background related classes
+    private EnemyGenerator enemyGenerator;
+    private LevelGenerator levelgen;
     
     /** 
         Sets up a GameServer instance, with initial values for the players.
@@ -77,6 +81,9 @@ public class GameServer {
         } catch (IOException ex) {
             System.out.println("IOException from GameServer");
         }
+
+        enemyGenerator = new EnemyGenerator();
+        levelgen = new LevelGenerator();
         
     }
 
@@ -216,6 +223,7 @@ public class GameServer {
                         p2ProjectileY = tempY;
 
                     }
+
                 }
             } catch (IOException ex) {
                 System.out.println("IOException at RFC.run()");
@@ -277,6 +285,10 @@ public class GameServer {
         public void run(){
             try {
                 while (true) {
+                    // must run before sending information
+                    updateValues();
+                    updateHealth();
+
                     if (playerID == 1){
                         dataOut.writeUTF(p2Name);
                         dataOut.writeDouble(p2x);
@@ -288,6 +300,25 @@ public class GameServer {
                         for (int i = 0; i < p2ProjectileCount ; i++){
                             dataOut.writeDouble(p2ProjectileX.get(i));
                             dataOut.writeDouble(p2ProjectileY.get(i));
+                        }
+
+                        for (int i = 0; i < 4; i ++){
+                            dataOut.writeDouble(enemyGenerator.get(i).getX());
+                            dataOut.writeDouble(enemyGenerator.get(i).getY());
+                            System.out.println(i + " health: " + enemyGenerator.get(i).getEnemyType().getHealth());
+                        }
+
+                        for (int i = 0 ; i < 4 ; i ++){
+                            if (enemyGenerator.get(i).getEnemyType().getProjectiles() == null){
+                                dataOut.writeInt(0);
+                            } else {
+                                dataOut.writeInt(2);
+                                for (int j = 0; j < 2; j ++){
+                                    dataOut.writeDouble(enemyGenerator.get(i).getEnemyType().getProjectiles().get(j).getX());
+                                    dataOut.writeDouble(enemyGenerator.get(i).getEnemyType().getProjectiles().get(j).getY());
+
+                                }
+                            }
                         }
 
                         dataOut.writeInt(p2CurrentImage);
@@ -306,6 +337,23 @@ public class GameServer {
                         for (int i = 0; i < p1ProjectileCount ; i++){
                             dataOut.writeDouble(p1ProjectileX.get(i));
                             dataOut.writeDouble(p1ProjectileY.get(i));
+                        }
+
+                        for (int i = 0; i < enemyGenerator.size(); i ++){
+                            dataOut.writeDouble(enemyGenerator.get(i).getX());
+                            dataOut.writeDouble(enemyGenerator.get(i).getY());
+                        }
+
+                        for (int i = 0 ; i < enemyGenerator.size() ; i ++){
+                            if (enemyGenerator.get(i).getEnemyType().getProjectiles() == null){
+                                dataOut.writeInt(0);
+                            } else {
+                                dataOut.writeInt(2);
+                                for (int j = 0; j < 2; j ++){
+                                    dataOut.writeDouble(enemyGenerator.get(i).getEnemyType().getProjectiles().get(j).getX());
+                                    dataOut.writeDouble(enemyGenerator.get(i).getEnemyType().getProjectiles().get(j).getY());
+                                }
+                            }
                         }
 
                         dataOut.writeInt(p1CurrentImage);
@@ -348,9 +396,113 @@ public class GameServer {
         }
     }
 
+     /**
+        Moves the enemy according to its truth values
+        of up, down, left, right directions. When it collides with a wall while
+        moving in that direction, it bounces back, forcing it to move the opposite
+        direction immediately.
+        <p></p> the enemy gets pushed back whenever it collides onto something.
+    **/
+    public void updateValues(){
+
+        enemyGenerator.moveAllEnemies();
+
+        for (Enemy enemy : enemyGenerator){
+
+            if (enemy.getEnemyType().isAlive()){
+                if (enemy.isMovingUp()){
+                    enemy.moveY((-(enemy.getSpeed())));
+                    if (enemy.enemyCollidingWithPlayer(p1x,p1y) || enemy.enemyCollidingWithPlayer(p2x, p2y)){  
+                        enemy.moveY((enemy.getSpeed()));
+    
+                    }
+                    if (checkCollision(enemy)){
+                        enemy.moveY((enemy.getSpeed()));
+                        enemy.moveCharacter("up", false);
+                        enemy.moveCharacter("down", true);
+                    }
+                    
+                }
+                if (enemy.isMovingDown()){
+                    enemy.moveY((enemy.getSpeed()));
+                    if (enemy.enemyCollidingWithPlayer(p1x,p1y) || enemy.enemyCollidingWithPlayer(p2x, p2y)){
+                        enemy.moveY((-(enemy.getSpeed())));
+                    }
+                    if (checkCollision(enemy)){
+                        enemy.moveY((-(enemy.getSpeed())));
+                        enemy.moveCharacter("up", true);
+                        enemy.moveCharacter("down", false);
+                    }
+                }
+                if (enemy.isMovingLeft()){
+                    enemy.moveX(-(enemy.getSpeed()));
+                    if (enemy.enemyCollidingWithPlayer(p1x,p1y) || enemy.enemyCollidingWithPlayer(p2x, p2y)){
+                        enemy.moveX(enemy.getSpeed());
+                    }
+                    if (checkCollision(enemy)){
+                        enemy.moveX(enemy.getSpeed());
+                        enemy.moveCharacter("left", false);
+                        enemy.moveCharacter("right", true);
+                    }
+                }
+                if (enemy.isMovingRight()){
+                    enemy.moveX(enemy.getSpeed());
+                    if (enemy.enemyCollidingWithPlayer(p1x,p1y) || enemy.enemyCollidingWithPlayer(p2x, p2y)){
+                        enemy.moveX(-(enemy.getSpeed()));
+                    }
+                    if (checkCollision(enemy)){
+                        enemy.moveX(-(enemy.getSpeed()));
+                        enemy.moveCharacter("left", true);
+                        enemy.moveCharacter("right", false);
+                    }
+                }
+                   
+                enemy.getEnemyType().attack();
+            } else {
+                enemy.setX(-5000);
+                enemy.setY(-5000);
+            }
+
+            enemy.getEnemyType().displayImage();
+        }
+    }
+
+    /**
+        Checks whether the enemy is currently colliding with a wall
+        @param enemy is the enemy being checked for collision.
+        @return true if that enemy is colliding with a wall, false otherwise.
+    **/
+    public boolean checkCollision(Enemy enemy){
+        
+        boolean collding = false;
+        for (Walls w : LevelGenerator.getWalls()){
+            if (enemy.isCollidingWithWall(w)){
+                collding = true;
+                break;
+            }
+        }
+        return collding;
+    }
+
+    /** 
+        Updates the health of all enemies whenever they collide with the 
+        player.
+    **/
+    public void updateHealth(){
+        
+        enemyGenerator.reduceIFrames();
+
+        enemyGenerator.collidedWithBullet(p1ProjectileX, p1ProjectileY, p1CharacterType);
+        enemyGenerator.collidedWithBullet(p2ProjectileX, p2ProjectileY, p2CharacterType);
+
+        enemyGenerator.collidingWithWeapon();
+    
+    }
+
+   
     public static void main(String[] args) {
         GameServer gs = new GameServer();
         gs.allowConnection();
     }
-    
+
 }

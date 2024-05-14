@@ -468,18 +468,20 @@ public abstract class EnemyType {
 
         for  (int i = 0; i < projectiles.size() ; i ++){
 
-            for (Walls w : GameCanvas.getWalls()){
+            for (Walls w : LevelGenerator.getWalls()){
                 if (projectiles.get(i).isCollidingWithWall(w)){
                     projectiles.get(i).setActive();
                     projectiles.get(i).setProjectileX(-5000);
                     projectiles.get(i).setProjectileY(-5000);
+                    break;
                 }
             }
-
+            
             double x = Math.abs(projectiles.get(i).getX() - projectiles.get(i).getInitialX());
             double y = Math.abs(projectiles.get(i).getY() - projectiles.get(i).getInitialY());
             double pythagorean = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
-            if (pythagorean >= 600 && projectiles.get(i).isActive()){
+
+            if (pythagorean >= 550 && projectiles.get(i).isActive()){
                 projectiles.get(i).setActive();
                 projectiles.get(i).setProjectileX(-5000);
                 projectiles.get(i).setProjectileY(-5000);
