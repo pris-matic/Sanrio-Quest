@@ -521,13 +521,5 @@ public abstract class CharacterType {
         }
     }
 
-    /**
-        Checks whether the player is currently attacking with their weapon
-        such as swinging the Melee Class' weapon.
-        @param enemy is the enemy being checked if the player's weapon is colliding with them
-        @see #isAttacking()
-        @see Melee
-    **/
-    public abstract void weaponCollidingWithEnemy(Enemy enemy);
 
 }

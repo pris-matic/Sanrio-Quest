@@ -207,6 +207,15 @@ public class Ranger extends CharacterType {
         return bulletList;
     }
 
+    /**
+    The Bullet inner class is a subclass of the <code> Projectiles </code>
+    abstract inner class. It sets up the projectiles for this class
+    such as its speed.
+
+    @author Anthony B. Deocadiz Jr. (232166)
+    @author Ramona Miekaela S. Laciste (233403)
+    @version April 02, 2024
+    **/
     class Bullet extends Projectiles{
 
         public Bullet(double x, double y, double rotation){
@@ -234,35 +243,6 @@ public class Ranger extends CharacterType {
             g2d.setColor(Color.DARK_GRAY);
             Ellipse2D.Double bullet = new Ellipse2D.Double(xPos,yPos,this.width,this.height);
             g2d.fill(bullet);
-        }
-    }
-
-    /**
-        Checks whether the player is currently attacking with their weapon.
-        @param enemy is the enemy being checked if the player's weapon is colliding with them
-    **/
-    @Override
-    public void weaponCollidingWithEnemy(Enemy enemy) {
-          
-        double initialX = (cm.getX()+cm.getWidth()*11/20);
-        double width = 30;
-
-        double initialY = (cm.getY()+(cm.getHeight()/2));
-        double height = 40;
-
-        if (attacking){
-
-            boolean colliding = false;
-
-            colliding = !(initialX + width <= enemy.getX()
-            || initialX >= enemy.getX() + enemy.getWidth()
-            || initialY + height <= enemy.getY()
-            || initialY >= enemy.getY() + enemy.getHeight());
-
-            if (colliding){
-                enemy.getEnemyType().takeDamage(atk);
-            }
-
         }
     }
 

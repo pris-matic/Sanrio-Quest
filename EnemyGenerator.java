@@ -103,9 +103,74 @@ public class EnemyGenerator extends CopyOnWriteArrayList<Enemy>{
         }
     }
 
-    public void collidingWithWeapon(){
+    /**
+        Checks whether the player is currently attacking with their weapon
+        such as swinging the Melee Class' weapon.   
+        @param xPos is the x Position of the player
+        @param yPos is the y Position of the player
+        @param rotation is the current rotation of the player
+        @param characterType is the CharacterType of the player.
+    **/
+    public void collidingWithWeapon(double xPos, double yPos, double rotation, String characterType){
         for (Enemy enemy : this){
-            
+            if (characterType.equalsIgnoreCase("melee")){
+                
+                double initialX = (xPos+(30)-12);
+                double width = 25;
+                double swordPositionX = initialX + (Math.cos(rotation) * width);
+                
+                double initialY = (yPos+(90*2/3));
+                double height = 95;
+                double swordPositionY = initialY + (Math.sin(rotation) * height);
+
+                boolean colliding = false;
+
+                colliding = !(swordPositionX + width <= enemy.getX()
+                || swordPositionX >= enemy.getX() + enemy.getWidth()
+                || swordPositionY + height <= enemy.getY()
+                || swordPositionY >= enemy.getY() + enemy.getHeight());
+
+                if (colliding){
+                    enemy.getEnemyType().takeDamage(5);
+                }
+
+            } else if (characterType.equalsIgnoreCase("wizard")){
+
+                double initialX = (xPos+(60*0.65));
+                double width = 15;
+
+                double initialY = (yPos+30);
+                double height = 50;
+
+                boolean colliding = false;
+
+                colliding = !(initialX + width <= enemy.getX()
+                || initialX >= enemy.getX() + enemy.getWidth()
+                || initialY + height <= enemy.getY()
+                || initialY >= enemy.getY() + enemy.getHeight());
+
+                if (colliding){
+                    enemy.getEnemyType().takeDamage(7);
+                }
+  
+            } else if (characterType.equalsIgnoreCase("ranger")){
+                double initialX = (xPos+60*11/20);
+                double width = 30;
+
+                double initialY = (yPos+(90/2));
+                double height = 40;
+
+                boolean colliding = false;
+
+                colliding = !(initialX + width <= enemy.getX()
+                || initialX >= enemy.getX() + enemy.getWidth()
+                || initialY + height <= enemy.getY()
+                || initialY >= enemy.getY() + enemy.getHeight());
+
+                if (colliding){
+                    enemy.getEnemyType().takeDamage(10);
+                }                
+            }
         }
     }
 

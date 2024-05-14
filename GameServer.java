@@ -495,7 +495,9 @@ public class GameServer {
         enemyGenerator.collidedWithBullet(p1ProjectileX, p1ProjectileY, p1CharacterType);
         enemyGenerator.collidedWithBullet(p2ProjectileX, p2ProjectileY, p2CharacterType);
 
-        enemyGenerator.collidingWithWeapon();
+        enemyGenerator.collidingWithWeapon(p1x,p1y,p1rotation,p1CharacterType);
+        enemyGenerator.collidingWithWeapon(p2x,p2y,p2rotation,p2CharacterType);
+        
     
     }
 

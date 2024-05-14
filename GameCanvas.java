@@ -180,7 +180,6 @@ public class GameCanvas extends JComponent implements Runnable {
     public void checkDamageCollision(){
         for (Enemy enemy : enemyGenerator){
             p.isCollidingWithBullet(enemy);
-            p.getCharacterType().weaponCollidingWithEnemy(enemy);
             p.bulletCollidedWithEnemy(enemy);
         }
 

@@ -208,9 +208,14 @@ public class Wizard extends CharacterType{
     }
 
     /**
-     * The Orb Class represents the Orb projectile fired by the wizard character.
-     * Extends the Projectiles class.
-     */
+    The Orb inner class is a subclass of the <code> Projectiles </code>
+    abstract inner class. It sets up the projectiles for this class
+    such as its speed.
+
+    @author Anthony B. Deocadiz Jr. (232166)
+    @author Ramona Miekaela S. Laciste (233403)
+    @version April 02, 2024
+    **/
     class Orb extends Projectiles{
 
         /**
@@ -249,33 +254,4 @@ public class Wizard extends CharacterType{
         }
     }
 
-    /**
-        Checks whether the player is currently attacking with their weapon.
-        @param enemy is the enemy being checked if the player's weapon is colliding with them
-    **/
-    @Override
-    public void weaponCollidingWithEnemy(Enemy enemy) {
-        
-        double initialX = (cm.getX()+(cm.getWidth()*0.65));
-        double width = 15;
-
-        double initialY = (cm.getY()+30);
-        double height = 50;
-
-        if (attacking){
-
-            boolean colliding = false;
-
-            colliding = !(initialX + width <= enemy.getX()
-            || initialX >= enemy.getX() + enemy.getWidth()
-            || initialY + height <= enemy.getY()
-            || initialY >= enemy.getY() + enemy.getHeight());
-
-            if (colliding){
-                enemy.getEnemyType().takeDamage(atk);
-            }
-
-        }
-    }
- 
 }

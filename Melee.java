@@ -195,37 +195,4 @@ public class Melee extends CharacterType {
 
     }
 
-    /**
-        Checks whether the player is currently attacking with their weapon.
-        @param enemy is the enemy being checked if the player's weapon is colliding with them
-    **/
-    @Override
-    public void weaponCollidingWithEnemy(Enemy enemy) {
-
-        double initialX = (cm.getX()+(cm.getWidth()/2)-12);
-        double width = 25;
-        double swordPositionX = initialX + (Math.cos(rotation) * width);
-        
-        double initialY = (cm.getY()+(cm.getHeight()*2/3));
-        double height = 95;
-        double swordPositionY = initialY + (Math.sin(rotation) * height);
-
-
-
-        if (attacking){
-
-            boolean colliding = false;
-
-            colliding = !(swordPositionX + width <= enemy.getX()
-            || swordPositionX >= enemy.getX() + enemy.getWidth()
-            || swordPositionY + height <= enemy.getY()
-            || swordPositionY >= enemy.getY() + enemy.getHeight());
-
-            if (colliding){
-                enemy.getEnemyType().takeDamage(atk);
-            }
-            
-        }
-    }
-
 }
