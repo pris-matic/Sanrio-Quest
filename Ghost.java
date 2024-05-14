@@ -4,7 +4,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import javax.imageio.ImageIO;
 
 /**
-* Represents a ghost enemy in the game.
+* The Ghost sublcass is one of the enemies that the
+    players can face against.
 * Extends the EnemyType class.
 */
 public class Ghost extends EnemyType {
@@ -19,7 +20,7 @@ public class Ghost extends EnemyType {
         
         maxHp = 100;
         hp = 100;
-        atk = 4;
+        atk = 5;
         def = 2;
 
         alive = true;
@@ -73,7 +74,7 @@ public class Ghost extends EnemyType {
      */
     @Override
     public void attack() {
-        
+        // unused do to the subclass having no projeciles
     }
 
     /**
@@ -81,7 +82,7 @@ public class Ghost extends EnemyType {
      */
     @Override
     public void attackMovement() {
-        
+        // unused do to the subclass having no projeciles
     }
 
     /**

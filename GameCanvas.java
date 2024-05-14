@@ -1,6 +1,8 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.*;
+import java.io.*;
 
 /**
 The GameCanvas class is responsible for drawing the
@@ -39,6 +41,8 @@ public class GameCanvas extends JComponent implements Runnable {
     private Camera camera;
     private static LevelGenerator lg;
     private EnemyGenerator enemyGenerator;
+    private Image gameOverImage,gameWinImage;
+
 
     /**
         Instantiates a GameCanvas object, with fixed dimensions of
@@ -73,6 +77,13 @@ public class GameCanvas extends JComponent implements Runnable {
 
         p2HealthBar = new HealthBar(590, 10, 200, 35, 
             p2.getCharacterType().getMaxHealth(),Color.GREEN.darker(),true,p2);
+
+        try {
+            gameOverImage = ImageIO.read(new File("Sprites/LevelDesign/Game_Over.png"));
+            gameWinImage = ImageIO.read(new File("Sprites/LevelDesign/Game_Win.png"));
+        } catch (IOException e) {
+            System.out.println("Image not found.");
+        }
 
     }
 
@@ -132,6 +143,9 @@ public class GameCanvas extends JComponent implements Runnable {
         // resets its rotation and then draws the attack / projectiles
         g2d.setTransform(saveState);
         p2.getCharacterType().drawAttacks(g2d);
+
+        g2d.drawImage(gameOverImage, 9630, 9745, 800, 600, null);
+        g2d.drawImage(gameWinImage, -10000, -10000, 800, 600, null);
 
         for (Enemy enemy : enemyGenerator){
             enemy.drawCharacter(g2d);

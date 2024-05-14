@@ -28,23 +28,24 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class EnemyGenerator extends CopyOnWriteArrayList<Enemy>{
     
+    private int currentLevel;
+
+    /**
+        Makes a new arraylist of enemies that contains two
+        Ghosts and two WingedCreatures
+        @see Ghost
+        @see WingedCreature
+    **/
     public EnemyGenerator(){
         
         super();
 
-        // TODO final work
+        this.add(new Enemy("ghost", 1200, 1800));
+        this.add(new Enemy("ghost", 1200, 1800));
+        this.add(new Enemy("wingedcreature", 1200, 1800));
+        this.add(new Enemy("wingedcreature", 1200, 1800));
 
-        // this.add(new Enemy("ghost", -5000, -5000));
-        // this.add(new Enemy("ghost", -5000, -5000));
-        // this.add(new Enemy("wingedcreature", -5000, -5000));
-        // this.add(new Enemy("wingedcreature", -5000, -5000));
-        
-        // TODO debug mode
-
-        this.add(new Enemy("ghost", 600, 200));
-        this.add(new Enemy("ghost", 600, 200));
-        this.add(new Enemy("wingedcreature", 600, 200));
-        this.add(new Enemy("wingedcreature", 600, 200));
+        currentLevel = 0;
         
     }
 
@@ -52,11 +53,49 @@ public class EnemyGenerator extends CopyOnWriteArrayList<Enemy>{
         Whenever the players enter a new level, the same enemies
         get respawned back, with their health being set back to maximum
         @see EnemyType#getMaxHealth()
+        @see EnemyType#setAlive()
     **/
     public void resetHealth(){
         for (Enemy enemy : this){
             enemy.getEnemyType().setHealthToMaximum();
             enemy.getEnemyType().setAlive();
+        }
+        currentLevel ++;
+        switch (currentLevel) {
+            case 1:
+                for (Enemy enemy : this){
+                    enemy.setX(3600);
+                    enemy.setY(1700);
+                }
+                break;
+        
+            case 2:
+                for (Enemy enemy : this){
+                    enemy.setX(5900);
+                    enemy.setY(1700);
+                }
+                break;
+
+            case 3:
+                for (Enemy enemy : this){
+                    enemy.setX(8300);
+                    enemy.setY(1700);
+                }
+                break;
+
+            case 4:
+                for (Enemy enemy : this){
+                    enemy.setX(10700);
+                    enemy.setY(1700);
+                }
+                break;
+
+            default:
+                for (Enemy enemy : this){
+                    enemy.setX(-7000);
+                    enemy.setY(-7000);
+                }
+                break;
         }
     }
 
@@ -172,6 +211,15 @@ public class EnemyGenerator extends CopyOnWriteArrayList<Enemy>{
                 }                
             }
         }
+    }
+
+    /**
+        Gets the current level where the enemies are being generated.
+        Levels start at 0.
+        @return the current level.
+    **/
+    public int getCurrentLevel(){
+        return currentLevel;
     }
 
 }

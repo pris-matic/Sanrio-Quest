@@ -73,7 +73,7 @@ public class GameFrame {
         gc = new GameCanvas(p,p2);
         enemygen = gc.getEnemies();
         gc.startThread();
-        frame.add(gc);
+        frame.add(gc);  
         frame.pack();
 
         frame.setResizable(false);
@@ -90,17 +90,13 @@ public class GameFrame {
     private void createPlayers(){
         
         if (playerID == 1){
-            p = new Player(name,playerType,200,200);
-            p2 = new Player(p2Name,p2PlayerType,400,200);
+            p = new Player(name,playerType,400,1900);
+            p2 = new Player(p2Name,p2PlayerType,400,2000);
         } else {
-            
-            // TODO revert if multi
-            p2 = new Player(p2Name,p2PlayerType,200,200);
-            p = new Player(name,playerType,400,200);
-
-            // TODO single player debugging!
-            // p2 = new Player("test","wizard",200,200);
-            // p = new Player("player","ranger",400,200);
+            // p2 = new Player(p2Name,p2PlayerType,400,2000);
+            // p = new Player(name,playerType,400,2000);
+            p2 = new Player("p2Name","melee",400,2000);
+            p = new Player("a","wizard",-9630,-9745);
         }
     }
     
@@ -347,6 +343,8 @@ public class GameFrame {
 
                     int playerImage = dataIn.readInt();
                     double player2Health = dataIn.readDouble();
+                    boolean player2Alive = dataIn.readBoolean();
+                    int toNextLevel = dataIn.readInt();
                     
                     if(p2 != null && enemygen != null){
                         p2.setName(playerName);
@@ -381,8 +379,6 @@ public class GameFrame {
                         // which is at index 2 and 3 always
                         for (int i = 2; i < 4; i++){
 
-                            
-
                             for (int j = 0 ; j < 2; j++){
                                 if (i == 2){
                                     gc.getEnemies().get(i).getEnemyType().getProjectiles().get(j).setProjectileX(enemyProjectileX.get(j));
@@ -392,8 +388,16 @@ public class GameFrame {
                                     gc.getEnemies().get(i).getEnemyType().getProjectiles().get(j).setProjectileY(enemyProjectileY.get(j+2));
                                 }
                             }
+                        }
 
+                        if (!player2Alive){
+                            gameOver();
+                            p.getCharacterType().setAlive();
+                        }
 
+                        if (p.getLevelsCleared() < toNextLevel){
+                            moveToNextLevel(toNextLevel);
+                            p.addLevelWin();
                         }
                         
                     }
@@ -477,6 +481,7 @@ public class GameFrame {
 
                         dataOut.writeInt(p.getCharacterType().getSpriteNumber());
                         dataOut.writeDouble(p.getCharacterType().getHealth());
+                        dataOut.writeBoolean(p.getCharacterType().isAlive());
                     
                         dataOut.flush();
 
@@ -533,4 +538,70 @@ public class GameFrame {
         }
     }
 
+    /** 
+        Teleports the players to the GameOver screen whenever one
+        of the players had died.
+        @see CharacterType#isAlive()
+    **/
+    public void gameOver(){
+        p.setX(10000);
+        p.setY(10000);
+        p2.setX(10000);
+        p2.setY(10000);
+    }
+
+    /** 
+        Teleports the players to the Winner's screen when they have
+        cleared all the levels without dying.
+        @see Player#getLevelsCleared()
+    **/
+    public void gameWin(){
+        p.setX(-9630);
+        p.setY(-9745);
+        p2.setX(-9630);
+        p2.setY(-9745);
+    }
+
+    /**
+        Moves to the next level whenever all the enemies have been
+        eliminated.
+        @param level is the next level to go to.
+        @see EnemyGenerator#resetHealth()
+    **/
+    public void moveToNextLevel(int level){
+
+        switch (level) {
+            case 1:
+                p.setX(2800);
+                p.setY(1700);
+                p2.setX(2800);
+                p2.setY(1700);
+                break;
+            
+            case 2:
+                p.setX(5300);
+                p.setY(1700);
+                p2.setX(5300);
+                p2.setY(1700);
+                break;
+
+            case 3:
+                p.setX(7600);
+                p.setY(1700);
+                p2.setX(7600);
+                p2.setY(1700);
+                break;
+
+            case 4:
+                p.setX(10000);
+                p.setY(1700);
+                p2.setX(10000);
+                p2.setY(1700);
+
+            case 5:
+                gameWin();
+                break;
+
+        }
+    }
 }

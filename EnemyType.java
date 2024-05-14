@@ -125,15 +125,13 @@ public abstract class EnemyType {
     }
 
     /**
-        Flips the current boolean value of the alive variable.
+        Sets the enemies to become alive.
         Determines whether the enemy instance should be moved inside the
         playing field.
         @see #isAlive()
     **/
     public void setAlive(){
-        if (alive){
-            alive = false;
-        } else {
+        if (!alive){
             alive = true;
         }
     }

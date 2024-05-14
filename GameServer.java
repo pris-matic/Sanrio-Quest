@@ -44,6 +44,7 @@ public class GameServer {
     private String p1Name,p2Name,p1CharacterType,p2CharacterType;
     private double p1x,p1y,p2x,p2y,p1rotation,p2rotation,p1Health,p2Health;
     private int p1CurrentImage,p2CurrentImage;
+    private boolean p1Alive, p2Alive;
 
     // contents of the arraylist sent as primitive types
     private int p1ProjectileCount,p2ProjectileCount;
@@ -75,6 +76,9 @@ public class GameServer {
 
         p2ProjectileX = new ArrayList<>();
         p2ProjectileY = new ArrayList<>();
+
+        p1Alive = true;
+        p2Alive = true;
 
         try {
             ss = new ServerSocket(45375);
@@ -196,6 +200,7 @@ public class GameServer {
 
                         p1CurrentImage = dataIn.readInt();
                         p1Health = dataIn.readDouble();
+                        p1Alive = dataIn.readBoolean();
 
                         p1ProjectileX = tempX;
                         p1ProjectileY = tempY;
@@ -218,6 +223,7 @@ public class GameServer {
 
                         p2CurrentImage = dataIn.readInt();
                         p2Health = dataIn.readDouble();
+                        p2Alive = dataIn.readBoolean();
 
                         p2ProjectileX = tempX;
                         p2ProjectileY = tempY;
@@ -305,7 +311,6 @@ public class GameServer {
                         for (int i = 0; i < 4; i ++){
                             dataOut.writeDouble(enemyGenerator.get(i).getX());
                             dataOut.writeDouble(enemyGenerator.get(i).getY());
-                            System.out.println(i + " health: " + enemyGenerator.get(i).getEnemyType().getHealth());
                         }
 
                         for (int i = 0 ; i < 4 ; i ++){
@@ -323,6 +328,8 @@ public class GameServer {
 
                         dataOut.writeInt(p2CurrentImage);
                         dataOut.writeDouble(p2Health);
+                        dataOut.writeBoolean(p2Alive);
+                        dataOut.writeInt(enemyGenerator.getCurrentLevel());
 
                         dataOut.flush();
     
@@ -358,6 +365,8 @@ public class GameServer {
 
                         dataOut.writeInt(p1CurrentImage);
                         dataOut.writeDouble(p1Health);
+                        dataOut.writeBoolean(p1Alive);
+                        dataOut.writeInt(enemyGenerator.getCurrentLevel());
 
                         dataOut.flush();
 
@@ -497,10 +506,25 @@ public class GameServer {
 
         enemyGenerator.collidingWithWeapon(p1x,p1y,p1rotation,p1CharacterType);
         enemyGenerator.collidingWithWeapon(p2x,p2y,p2rotation,p2CharacterType);
+
+        updateLevel();
         
-    
     }
 
+    /**
+        Goes to the next level whenever all enemies had died.
+    **/
+    public void updateLevel(){
+        int enemiesDied = 0;
+        for (int i = 0 ; i < enemyGenerator.size() ; i++){
+            if (!enemyGenerator.get(i).getEnemyType().isAlive()){
+                enemiesDied ++;
+            }
+        }
+        if (enemiesDied == 4){
+            enemyGenerator.resetHealth();
+        }
+    }
    
     public static void main(String[] args) {
         GameServer gs = new GameServer();

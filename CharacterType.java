@@ -92,6 +92,15 @@ public abstract class CharacterType {
     }
 
     /**
+        Sets the player to a "dead" state when one of the players lost all their
+        heaith.
+        @see GameFrame#gameOver()
+    **/
+    public void setAlive(){
+        alive = false;
+    }
+
+    /**
         Checks whether the object / player is attacking.
         @return true if the player is attacking, false otherwise.
     **/
@@ -511,7 +520,7 @@ public abstract class CharacterType {
                 double y = Math.abs(projectiles.get(i).getY() - projectiles.get(i).getInitialY());
                 double pythagorean = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
 
-                if (pythagorean >= 700 && projectiles.get(i).isActive()){
+                if (pythagorean >= 600 && projectiles.get(i).isActive()){
                     projectiles.get(i).setActive();
                     projectiles.get(i).setProjectileX(-5000);
                     projectiles.get(i).setProjectileY(-5000);

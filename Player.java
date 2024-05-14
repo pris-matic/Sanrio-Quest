@@ -27,6 +27,7 @@ of our program.
 
 public class Player extends CharacterManager{
 
+    private int levelsCleared;
       /**
      * Constructor for the Player class.
      * 
@@ -61,6 +62,7 @@ public class Player extends CharacterManager{
         width = 60;
         height = 90;
         speed = 4;
+        levelsCleared = 0;
 
         enemyList = new CopyOnWriteArrayList<>();
  
@@ -80,7 +82,7 @@ public class Player extends CharacterManager{
 
     }
 
-/**
+    /**
      * Checks if the player is colliding with an enemy's bullet.
      * 
      * @param enemy The enemy whose bullet is being checked for collision.
@@ -97,7 +99,11 @@ public class Player extends CharacterManager{
         }
     }
 
-    // TODO javadoc -- when enemy gets hit
+    /**
+     * Checks if the enemy is colliding with the player's projectiles (if any)
+     * 
+     * @param enemy The enemy whose being checked for projectile collision.
+    **/
     public void bulletCollidedWithEnemy(Enemy enemy){
 
         if (getCharacterType().getProjectiles() != null){
@@ -110,6 +116,25 @@ public class Player extends CharacterManager{
                 }
             }
         }
+    }
+
+    /**
+        Whenever the number of enemies from the server goes to 0
+        this gets updated, and then is checked after the number of
+        alive enemies goes back down to 0 aga in.
+        @see EnemyGenerator#getCurrentLevel()
+    **/
+    public void addLevelWin(){
+        levelsCleared++;
+    }
+
+    /**
+        The number of levels cleared is checked to determine
+        if the players will go to the next level.
+        @return the current levels cleared by the players.
+    **/
+    public int getLevelsCleared(){
+        return levelsCleared;
     }
     
 }
