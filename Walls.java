@@ -45,7 +45,11 @@ public class Walls implements BackgroundManager {
         this.height = height;
         color = new Color(135,211,130);
     }
-
+    
+    /**
+     * Draws the wall on the game screen.
+     * @param g2d The Graphics2D object used for drawing.
+     */
     @Override
     public void draw (Graphics2D g2d){
         
@@ -55,18 +59,34 @@ public class Walls implements BackgroundManager {
 
     }
 
+    /**
+     * Gets the x-coordinate of the wall.
+     * @return The x-coordinate of the wall.
+     */
     public double getX(){
         return x;
     }
-
+    
+    /**
+     * Gets the y-coordinate of the wall.
+     * @return The y-coordinate of the wall.
+     */
     public double getY(){
         return y;
     }
 
+    /**
+     * Gets the width of the wall.
+     * @return The width of the wall.
+     */
     public double getWidth(){
         return width;
     }
 
+    /**
+     * Gets the height of the wall.
+     * @return The height of the wall.
+     */
     public double getHeight(){
         return height;
     }

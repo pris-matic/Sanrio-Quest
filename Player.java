@@ -26,7 +26,15 @@ of our program.
 */
 
 public class Player extends CharacterManager{
-      
+
+      /**
+     * Constructor for the Player class.
+     * 
+     * @param name The name of the player.
+     * @param characterType The type of character chosen by the player.
+     * @param xPos The initial x-coordinate of the player.
+     * @param yPos The initial y-coordinate of the player.
+     */
     public Player(String name, String characterType, int xPos, int yPos){
         
         this.name = name;
@@ -58,6 +66,11 @@ public class Player extends CharacterManager{
  
     }
 
+       /**
+     * Draws the character on the screen.
+     * 
+     * @param g2d The graphics context.
+     */
     @Override
     public void drawCharacter(Graphics2D g2d){
        
@@ -67,7 +80,11 @@ public class Player extends CharacterManager{
 
     }
 
-    // TODO javadoc -- when player gets hit
+/**
+     * Checks if the player is colliding with an enemy's bullet.
+     * 
+     * @param enemy The enemy whose bullet is being checked for collision.
+     */
     public void isCollidingWithBullet(Enemy enemy){
 
         if (enemy.getEnemyType().getProjectiles() != null){

@@ -7,7 +7,7 @@ import javax.imageio.ImageIO;
 import javax.swing.Timer;
 
 /**
-The Melee class is a subclass of the <code> CharacterType </code>
+The Wizard class is a subclass of the <code> CharacterType </code>
 abstract class. It is the type of character the player uses
 inside the game.
 
@@ -35,6 +35,10 @@ public class Wizard extends CharacterType{
     private CopyOnWriteArrayList<Projectiles> orbList;
     private Timer orbMovement;
 
+     /**
+     * Constructor for the Wizard class.
+     * @param cm The CharacterManager object associated with the game.
+     */
     public Wizard(CharacterManager cm){
         
         maxHp = 125;
@@ -57,11 +61,18 @@ public class Wizard extends CharacterType{
         alive = true;
     }
 
+    /**
+     * Returns the type of the character.
+     * @return A string representing the character type ("Wizard").
+     */
     @Override
     public String showCharacterType() {
         return "Wizard";
     }
 
+    /**
+     * Loads images for the wizard character from the resource directory.
+     */
     @Override
     public void getImages(){
 
@@ -93,12 +104,20 @@ public class Wizard extends CharacterType{
         }
     }
 
+    /**
+     * Draws the wizard's weapon on the game screen.
+     * @param g2d The Graphics2D object used for drawing.
+     */
     @Override
     public void drawWeapon(Graphics2D g2d) {
         
         g2d.drawImage(weaponImg, (int) (cm.getX()+(cm.getWidth()*0.65)), (int) (cm.getY()+30), 15, 50, null);
     }
 
+    /**
+     * Draws the attacks of the wizard character on the game screen.
+     * @param g2d The Graphics2D object used for drawing.
+     */
     @Override
     public void drawAttacks(Graphics2D g2d){
         for (Projectiles o : orbList){
@@ -106,6 +125,11 @@ public class Wizard extends CharacterType{
         }
     }
 
+    /**
+     * Changes the rotation angle of the wizard's projectile.
+     * @param yPos The y-coordinate of the target position.
+     * @param xPos The x-coordinate of the target position.
+     */
     @Override
     public void changeRotation(double yPos, double xPos){
         
@@ -115,6 +139,9 @@ public class Wizard extends CharacterType{
 
     }
 
+    /**
+     * Initiates an attack action for the wizard character.
+     */
     @Override
     public void attack(){
         
@@ -142,11 +169,18 @@ public class Wizard extends CharacterType{
         attackMovement();
     }
 
+    /**
+     * Gets the projectiles associated with the wizard character.
+     * @return A list of Projectiles associated with the wizard character.
+     */
     @Override
     public CopyOnWriteArrayList<Projectiles> getProjectiles(){
         return orbList;
     }
 
+    /**
+     * Handles the movement of the wizard's projectile during an attack action.
+     */
     @Override
     public void attackMovement(){
         
@@ -173,8 +207,18 @@ public class Wizard extends CharacterType{
           
     }
 
+    /**
+     * The Orb Class represents the Orb projectile fired by the wizard character.
+     * Extends the Projectiles class.
+     */
     class Orb extends Projectiles{
-        
+
+        /**
+         * Constructor for the Orb class.
+         * @param x The initial x-coordinate of the projectile.
+         * @param y The initial y-coordinate of the projectile.
+         * @param rotation The rotation angle of the projectile.
+         */
         public Orb(double x, double y, double rotation){
 
             xPos = x;
@@ -192,7 +236,11 @@ public class Wizard extends CharacterType{
             active = false;
 
         }
-        
+
+        /**
+         * Draws the projectile on the game screen.
+         * @param g2d The Graphics2D object used for drawing.
+         */
         @Override
         public void drawProjectile(Graphics2D g2d){
             g2d.setColor(Color.RED);
