@@ -57,4 +57,8 @@ note: level selection currently unreleased | time until release: indefinite
 - Players must work together to win 5 stages, and they will lose whenever one of their health reaches to 0.
 
 
+## Additional Notes
+- Current release can be used for demo purposes only, and should NOT be modified in any way.
+
+
 
